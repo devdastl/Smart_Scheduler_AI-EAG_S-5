@@ -68,8 +68,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.error) {
                 smartOutput.value = `Error: ${data.error}`;
             } else {
-                // Update the output text
-                updateSmartOutput(data.text);
+                // The Python script now sends its output directly to the API
+                // We'll just show a success message
+                smartOutput.value = 'Python script executed successfully. Waiting for results...';
+                
+                // Check for updates to the output
+                checkForOutputUpdates();
             }
         })
         .catch(error => {
@@ -80,8 +84,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to update the output text
     function updateSmartOutput(text) {
-        // Send the output text to the server
-        fetch('/api/output', {
+        // Send the output text to the server using the new endpoint
+        fetch('/api/smart-output', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -90,13 +94,13 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            console.log('Output sent successfully:', data);
+            console.log('Output updated successfully:', data);
             
             // Update the output text area
             smartOutput.value = text;
         })
         .catch(error => {
-            console.error('Error sending output:', error);
+            console.error('Error updating output:', error);
             smartOutput.value = 'Error updating output. Please try again.';
         });
     }

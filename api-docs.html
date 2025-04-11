@@ -263,7 +263,24 @@
                 </div>
             </div>
             <div class="response">
-                <p>Returns the output from the Python script.</p>
+                <p>Returns a success message. The Python script will send its output directly to the /api/smart-output endpoint.</p>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <h3>Update Smart Output</h3>
+            <span class="method post">POST</span>
+            <span class="url">/api/smart-output</span>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">Body</span> - JSON object with:
+                    <ul>
+                        <li>text (string) - The text to display in the Smart Assistance output box</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="response">
+                <p>Returns a success object with the updated text.</p>
             </div>
         </div>
     </div>

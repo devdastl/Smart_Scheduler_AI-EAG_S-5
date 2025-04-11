@@ -229,6 +229,20 @@ app.post('/api/output', (req, res) => {
   res.json({ text: outputText });
 });
 
+// POST /api/smart-output
+app.post('/api/smart-output', (req, res) => {
+  const { text } = req.body;
+  
+  if (!text) {
+    return res.status(400).json({ error: 'No text provided' });
+  }
+  
+  // Update the output text
+  outputText = text;
+  
+  res.json({ success: true, text: outputText });
+});
+
 // POST /api/execute-python
 app.post('/api/execute-python', (req, res) => {
   const { text } = req.body;
@@ -239,7 +253,10 @@ app.post('/api/execute-python', (req, res) => {
   
   // Execute the Python script with the input text
   const { exec } = require('child_process');
-  const command = `python sample_script.py "${text}"`;
+  
+  // Set the NOTETAKER_SERVER_URL environment variable so the Python script knows where to send its results
+  const serverUrl = `http://localhost:${port}`;
+  const command = `NOTETAKER_SERVER_URL=${serverUrl} python sample_script.py "${text}"`;
   
   exec(command, (error, stdout, stderr) => {
     if (error) {
@@ -251,10 +268,9 @@ app.post('/api/execute-python', (req, res) => {
       console.error(`Python script stderr: ${stderr}`);
     }
     
-    // Update the output text with the result
-    outputText = stdout || 'No output from Python script';
-    
-    res.json({ text: outputText });
+    // The Python script now sends its output directly to the API
+    // We'll still return a success message
+    res.json({ success: true, message: 'Python script executed successfully' });
   });
 });
 

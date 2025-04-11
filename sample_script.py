@@ -7,6 +7,8 @@ This script takes input text and returns a processed version
 import sys
 import json
 import re
+import requests
+import os
 
 def process_text(text):
     """
@@ -36,6 +38,33 @@ You can modify this script to perform any text processing you need.
     
     return response
 
+def send_to_api(text):
+    """
+    Send the processed text to the API endpoint
+    """
+    # Get the server URL from environment or use default
+    server_url = os.environ.get('NOTETAKER_SERVER_URL', 'http://localhost:3000')
+    api_endpoint = f"{server_url}/api/smart-output"
+    
+    try:
+        # Send the text to the API
+        response = requests.post(
+            api_endpoint,
+            json={"text": text},
+            headers={"Content-Type": "application/json"}
+        )
+        
+        # Check if the request was successful
+        if response.status_code == 200:
+            print(f"Successfully sent text to API: {response.json()}")
+            return True
+        else:
+            print(f"Error sending text to API: {response.status_code} - {response.text}")
+            return False
+    except Exception as e:
+        print(f"Exception when sending to API: {str(e)}")
+        return False
+
 def main():
     # Check if text was provided as a command-line argument
     if len(sys.argv) < 2:
@@ -48,8 +77,13 @@ def main():
     # Process the text
     result = process_text(input_text)
     
-    # Print the result
-    print(result)
+    # Try to send the result to the API
+    api_success = send_to_api(result)
+    
+    # If API call failed, print to stdout as fallback
+    if not api_success:
+        print(result)
+        print("\nNote: Failed to send result to API. Printed to stdout instead.")
 
 if __name__ == "__main__":
     main() 
