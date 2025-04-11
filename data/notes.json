@@ -1,17 +1,20 @@
 [
   {
-    "id": "m9cpevx9knou8",
-    "type": "todo",
-    "content": "yes",
-    "date": "2025-04-11",
-    "createdAt": "2025-04-11T11:28:50.205Z",
-    "completed": false
+    "id": "m9cxnt71fdmx0",
+    "type": "reminder",
+    "date": "2025-04-15",
+    "content": "creating a reminder from mcp server",
+    "time": "12:50",
+    "triggered": false,
+    "createdAt": "2025-04-11T15:19:43.501Z"
   },
   {
-    "id": "m9ct1s6wrl7jc",
-    "type": "event",
-    "date": "2025-04-11",
-    "content": "API create envent",
-    "createdAt": "2025-04-11T13:10:37.304Z"
+    "id": "m9d5cucntuae7",
+    "type": "todo",
+    "date": "2025-04-12",
+    "content": "clean my keyboard",
+    "createdAt": "2025-04-11T18:55:08.711Z",
+    "completed": true,
+    "updatedAt": "2025-04-11T19:02:02.634Z"
   }
 ]

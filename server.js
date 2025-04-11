@@ -274,7 +274,7 @@ app.post('/api/execute-python', (req, res) => {
   
   // Set the NOTETAKER_SERVER_URL environment variable so the Python script knows where to send its results
   const serverUrl = `http://localhost:${port}`;
-  const command = `NOTETAKER_SERVER_URL=${serverUrl} python sample_script.py "${text}"`;
+  const command = `NOTETAKER_SERVER_URL=${serverUrl} python mcp_client.py "${text}"`;
   
   exec(command, (error, stdout, stderr) => {
     if (error) {

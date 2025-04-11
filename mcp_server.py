@@ -31,11 +31,11 @@ def list_todos(date: str) -> list[dict]:
 
 # Create a todo given a date and content
 @mcp.tool()
-def create_todo(date: str, content: str) -> dict:
+def create_todo(date: str, content: str) -> str:
     """Create a todo given a date and content"""
     print("CALLED: create_todo(date: str, content: str) -> dict:")
     response = requests.post(f"http://localhost:3000/api/todos/date/{date}", json={"content": content})
-    return {"success": True}
+    return f"Todo created successfully with id: {response.json()['id']}"
 
 # change todo status to completed given a unique id
 @mcp.tool()
@@ -43,7 +43,7 @@ def complete_todo(id: str) -> dict:
     """Change todo status to completed given a unique id"""
     print("CALLED: complete_todo(id: str) -> dict:")
     response = requests.put(f"http://localhost:3000/api/todos/{id}/toggle")
-    return {"success": True}
+    return f"Todo status updated successfully to completed"
 
 # change todo status to uncompleted given a unique id
 @mcp.tool()
@@ -51,7 +51,7 @@ def uncomplete_todo(id: str) -> dict:
     """Change todo status to uncompleted given a unique id"""
     print("CALLED: uncomplete_todo(id: str) -> dict:")
     response = requests.put(f"http://localhost:3000/api/todos/{id}/toggle")
-    return {"success": True}
+    return f"Todo status updated successfully to uncompleted"
 
 # Delete a todo given a unique id
 @mcp.tool()
@@ -59,15 +59,15 @@ def delete_todo(id: str) -> dict:
     """Delete a todo given a unique id"""
     print("CALLED: delete_todo(id: str) -> dict:")
     response = requests.delete(f"http://localhost:3000/api/todos/{id}")
-    return {"success": True}
+    return f"Todo deleted successfully"
 
 # Delete all todos given a date (dummy tool)
-@mcp.tool()
+#@mcp.tool()
 def delete_todos(date: str) -> dict:
     """Delete all todos given a date"""
     print("CALLED: delete_todos(date: str) -> dict:")
     response = requests.delete(f"http://localhost:3000/api/todos/date/{date}")
-    return {"success": True}
+    return f"All todos deleted successfully"
 
 # List all events given a date
 @mcp.tool()
@@ -83,7 +83,7 @@ def create_event(date: str, content: str) -> dict:
     """Create an event given a date and content"""
     print("CALLED: create_event(date: str, content: str) -> dict:")
     response = requests.post(f"http://localhost:3000/api/events/date/{date}", json={"content": content})
-    return {"success": True}
+    return f"Event created successfully with id: {response.json()['id']}"
 
 # Delete an event given a unique id
 @mcp.tool()
@@ -91,7 +91,7 @@ def delete_event(id: str) -> dict:
     """Delete an event given a unique id"""
     print("CALLED: delete_event(id: str) -> dict:")
     response = requests.delete(f"http://localhost:3000/api/events/{id}")
-    return {"success": True}
+    return f"Event deleted successfully"
 
 # List reminders given a date
 @mcp.tool()
@@ -107,7 +107,7 @@ def create_reminder(date: str, time: str, content: str) -> dict:
     """Create a reminder for a given date in YYYY-MM-DD format and at a given time in HH:MM 24-hour format and content"""
     print("CALLED: create_reminder(date: str, time: str, content: str) -> dict:")
     response = requests.post(f"http://localhost:3000/api/reminders/date/{date}", json={"content": content, "time": time})
-    return {"success": True}
+    return f"Reminder created successfully with id: {response.json()['id']}"
 
 # Delete a reminder given a unique id
 @mcp.tool()
@@ -115,7 +115,7 @@ def delete_reminder(id: str) -> dict:
     """Delete a reminder given a unique id"""
     print("CALLED: delete_reminder(id: str) -> dict:")
     response = requests.delete(f"http://localhost:3000/api/reminders/{id}")
-    return {"success": True}
+    return f"Reminder deleted successfully"
 
 # DEFINE RESOURCES
 
