@@ -456,4 +456,50 @@ input[type="time"] {
     text-align: center;
     color: var(--gray-color);
     padding: 20px;
+}
+
+/* Smart Assistance Section */
+.smart-assistance-section {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.smart-assistance-section h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+.input-container, .output-container {
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.input-container {
+    display: flex;
+    gap: 10px;
+}
+
+#smart-input, #smart-output {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    font-family: inherit;
+    resize: vertical;
+}
+
+#smart-output {
+    background-color: var(--output-bg);
+}
+
+#smart-submit {
+    align-self: flex-start;
+    margin-top: 10px;
 } 

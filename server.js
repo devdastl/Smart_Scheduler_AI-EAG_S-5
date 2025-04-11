@@ -229,6 +229,35 @@ app.post('/api/output', (req, res) => {
   res.json({ text: outputText });
 });
 
+// POST /api/execute-python
+app.post('/api/execute-python', (req, res) => {
+  const { text } = req.body;
+  
+  if (!text) {
+    return res.status(400).json({ error: 'No text provided' });
+  }
+  
+  // Execute the Python script with the input text
+  const { exec } = require('child_process');
+  const command = `python sample_script.py "${text}"`;
+  
+  exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error executing Python script: ${error}`);
+      return res.status(500).json({ error: 'Error executing Python script' });
+    }
+    
+    if (stderr) {
+      console.error(`Python script stderr: ${stderr}`);
+    }
+    
+    // Update the output text with the result
+    outputText = stdout || 'No output from Python script';
+    
+    res.json({ text: outputText });
+  });
+});
+
 // Todo specific endpoints
 app.get('/api/todos/date/:date', (req, res) => {
   const filterDate = new Date(req.params.date).toDateString();
