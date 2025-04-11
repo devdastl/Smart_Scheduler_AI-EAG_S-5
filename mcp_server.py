@@ -8,6 +8,7 @@ import time
 import subprocess
 import os
 import requests
+from datetime import datetime
 
 # instantiate an MCP server client
 mcp = FastMCP("NoteTaker")
@@ -100,10 +101,10 @@ def list_reminders(date: str) -> list[dict]:
     response = requests.get(f"http://localhost:3000/api/reminders/date/{date}")
     return response.json()
 
-# Create a reminder given a date in YYYY-MM-DD format and time in HH:MM format and content
+# Create a reminder given a date in YYYY-MM-DD format and time in HH:MM 24-hour format and content
 @mcp.tool()
 def create_reminder(date: str, time: str, content: str) -> dict:
-    """Create a reminder for a given date in YYYY-MM-DD format and at a given time in HH:MM format and content"""
+    """Create a reminder for a given date in YYYY-MM-DD format and at a given time in HH:MM 24-hour format and content"""
     print("CALLED: create_reminder(date: str, time: str, content: str) -> dict:")
     response = requests.post(f"http://localhost:3000/api/reminders/date/{date}", json={"content": content, "time": time})
     return {"success": True}
