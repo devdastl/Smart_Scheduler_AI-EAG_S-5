@@ -8,7 +8,7 @@
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
             color: #333;
@@ -17,420 +17,237 @@
             color: #2c3e50;
         }
         .endpoint {
-            margin-bottom: 30px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
             padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
+            margin-bottom: 20px;
         }
         .method {
             display: inline-block;
             padding: 3px 8px;
             border-radius: 3px;
+            color: white;
             font-weight: bold;
             margin-right: 10px;
         }
-        .get {
-            background-color: #61affe;
-            color: white;
-        }
-        .post {
-            background-color: #49cc90;
-            color: white;
-        }
-        .put {
-            background-color: #fca130;
-            color: white;
-        }
-        .delete {
-            background-color: #f93e3e;
-            color: white;
-        }
+        .get { background-color: #28a745; }
+        .post { background-color: #007bff; }
+        .put { background-color: #ffc107; }
+        .delete { background-color: #dc3545; }
         .url {
             font-family: monospace;
-            background-color: #f1f1f1;
+            background: #e9ecef;
             padding: 2px 5px;
             border-radius: 3px;
         }
+        .params {
+            margin-top: 10px;
+        }
         .param {
-            margin-left: 20px;
+            margin-bottom: 5px;
         }
         .param-name {
             font-weight: bold;
         }
-        .param-type {
-            color: #666;
-            font-style: italic;
-        }
-        .param-required {
-            color: #f93e3e;
-            margin-left: 5px;
-        }
         .response {
             margin-top: 10px;
+            background: #e9ecef;
             padding: 10px;
-            background-color: #f1f1f1;
             border-radius: 3px;
         }
-        .example {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #f1f1f1;
+        code {
+            background: #e9ecef;
+            padding: 2px 5px;
             border-radius: 3px;
             font-family: monospace;
-            white-space: pre-wrap;
+        }
+        .section {
+            margin-bottom: 40px;
         }
     </style>
 </head>
 <body>
     <h1>NoteTaker API Documentation</h1>
-    <p>This document provides information about the available API endpoints for the NoteTaker application.</p>
     
-    <h2>Base URL</h2>
-    <p>All API endpoints are relative to the base URL: <code>http://localhost:3000</code></p>
-    
-    <h2>Authentication</h2>
-    <p>Currently, the API does not require authentication.</p>
-    
-    <h2>Endpoints</h2>
-    
-    <div class="endpoint">
-        <h3><span class="method get">GET</span> <span class="url">/api/notes</span></h3>
-        <p>Get all notes with optional filtering.</p>
-        
-        <h4>Query Parameters</h4>
-        <div class="param">
-            <span class="param-name">type</span> <span class="param-type">(string)</span>
-            <p>Filter notes by type (todo, event, blocker, reminder).</p>
-        </div>
-        <div class="param">
-            <span class="param-name">date</span> <span class="param-type">(string)</span>
-            <p>Filter notes by date (YYYY-MM-DD format).</p>
-        </div>
-        
-        <h4>Response</h4>
-        <div class="response">
-            <p>Returns an array of note objects.</p>
-        </div>
-        
-        <h4>Example</h4>
-        <div class="example">
-GET /api/notes?type=todo&date=2023-05-15
+    <div class="section">
+        <h2>General Notes</h2>
+        <p>All endpoints return JSON responses. Dates should be in ISO format (YYYY-MM-DD).</p>
+    </div>
 
-Response:
-[
-  {
-    "id": "123456",
-    "type": "todo",
-    "content": "Complete project",
-    "date": "2023-05-15",
-    "completed": false,
-    "createdAt": "2023-05-14T12:00:00.000Z"
-  }
-]</div>
-    </div>
-    
-    <div class="endpoint">
-        <h3><span class="method get">GET</span> <span class="url">/api/notes/:id</span></h3>
-        <p>Get a specific note by ID.</p>
+    <div class="section">
+        <h2>Todo Endpoints</h2>
         
-        <h4>URL Parameters</h4>
-        <div class="param">
-            <span class="param-name">id</span> <span class="param-type">(string)</span> <span class="param-required">Required</span>
-            <p>The ID of the note to retrieve.</p>
+        <div class="endpoint">
+            <h3>List Todos for Date</h3>
+            <span class="method get">GET</span>
+            <span class="url">/api/todos/date/:date</span>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">date</span> - Date in YYYY-MM-DD format
+                </div>
+            </div>
+            <div class="response">
+                <p>Returns an array of todos for the specified date.</p>
+            </div>
         </div>
-        
-        <h4>Response</h4>
-        <div class="response">
-            <p>Returns a note object.</p>
-        </div>
-        
-        <h4>Example</h4>
-        <div class="example">
-GET /api/notes/123456
 
-Response:
-{
-  "id": "123456",
-  "type": "todo",
-  "content": "Complete project",
-  "date": "2023-05-15",
-  "completed": false,
-  "createdAt": "2023-05-14T12:00:00.000Z"
-}</div>
-    </div>
-    
-    <div class="endpoint">
-        <h3><span class="method post">POST</span> <span class="url">/api/todos</span></h3>
-        <p>Create a new todo.</p>
-        
-        <h4>Request Body</h4>
-        <div class="param">
-            <span class="param-name">content</span> <span class="param-type">(string)</span> <span class="param-required">Required</span>
-            <p>The content of the todo.</p>
+        <div class="endpoint">
+            <h3>Create Todo for Date</h3>
+            <span class="method post">POST</span>
+            <span class="url">/api/todos/date/:date</span>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">date</span> - Date in YYYY-MM-DD format
+                </div>
+                <div class="param">
+                    <span class="param-name">Body</span> - JSON object with:
+                    <ul>
+                        <li>content (string) - Todo content</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="param">
-            <span class="param-name">date</span> <span class="param-type">(string)</span> <span class="param-required">Required</span>
-            <p>The date of the todo (YYYY-MM-DD format).</p>
-        </div>
-        
-        <h4>Response</h4>
-        <div class="response">
-            <p>Returns the created todo object.</p>
-        </div>
-        
-        <h4>Example</h4>
-        <div class="example">
-POST /api/todos
-Content-Type: application/json
 
-{
-  "content": "Complete project",
-  "date": "2023-05-15"
-}
+        <div class="endpoint">
+            <h3>Toggle Todo Completion</h3>
+            <span class="method put">PUT</span>
+            <span class="url">/api/todos/:id/toggle</span>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">id</span> - Todo ID
+                </div>
+            </div>
+        </div>
 
-Response:
-{
-  "id": "123456",
-  "type": "todo",
-  "content": "Complete project",
-  "date": "2023-05-15",
-  "completed": false,
-  "createdAt": "2023-05-14T12:00:00.000Z"
-}</div>
-    </div>
-    
-    <div class="endpoint">
-        <h3><span class="method post">POST</span> <span class="url">/api/events</span></h3>
-        <p>Create a new event.</p>
-        
-        <h4>Request Body</h4>
-        <div class="param">
-            <span class="param-name">content</span> <span class="param-type">(string)</span> <span class="param-required">Required</span>
-            <p>The content of the event.</p>
-        </div>
-        <div class="param">
-            <span class="param-name">date</span> <span class="param-type">(string)</span> <span class="param-required">Required</span>
-            <p>The date of the event (YYYY-MM-DD format).</p>
-        </div>
-        
-        <h4>Response</h4>
-        <div class="response">
-            <p>Returns the created event object.</p>
+        <div class="endpoint">
+            <h3>Delete Todo</h3>
+            <span class="method delete">DELETE</span>
+            <span class="url">/api/todos/:id</span>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">id</span> - Todo ID
+                </div>
+            </div>
         </div>
     </div>
-    
-    <div class="endpoint">
-        <h3><span class="method post">POST</span> <span class="url">/api/blockers</span></h3>
-        <p>Create a new blocker.</p>
-        
-        <h4>Request Body</h4>
-        <div class="param">
-            <span class="param-name">content</span> <span class="param-type">(string)</span> <span class="param-required">Required</span>
-            <p>The content of the blocker.</p>
-        </div>
-        <div class="param">
-            <span class="param-name">date</span> <span class="param-type">(string)</span> <span class="param-required">Required</span>
-            <p>The date of the blocker (YYYY-MM-DD format).</p>
-        </div>
-        <div class="param">
-            <span class="param-name">startTime</span> <span class="param-type">(string)</span>
-            <p>The start time of the blocker (HH:MM format).</p>
-        </div>
-        <div class="param">
-            <span class="param-name">endTime</span> <span class="param-type">(string)</span>
-            <p>The end time of the blocker (HH:MM format).</p>
-        </div>
-        
-        <h4>Response</h4>
-        <div class="response">
-            <p>Returns the created blocker object.</p>
-        </div>
-    </div>
-    
-    <div class="endpoint">
-        <h3><span class="method post">POST</span> <span class="url">/api/reminders</span></h3>
-        <p>Create a new reminder.</p>
-        
-        <h4>Request Body</h4>
-        <div class="param">
-            <span class="param-name">content</span> <span class="param-type">(string)</span> <span class="param-required">Required</span>
-            <p>The content of the reminder.</p>
-        </div>
-        <div class="param">
-            <span class="param-name">date</span> <span class="param-type">(string)</span> <span class="param-required">Required</span>
-            <p>The date of the reminder (YYYY-MM-DD format).</p>
-        </div>
-        <div class="param">
-            <span class="param-name">time</span> <span class="param-type">(string)</span>
-            <p>The time of the reminder (HH:MM format).</p>
-        </div>
-        
-        <h4>Response</h4>
-        <div class="response">
-            <p>Returns the created reminder object.</p>
-        </div>
-    </div>
-    
-    <div class="endpoint">
-        <h3><span class="method put">PUT</span> <span class="url">/api/notes/:id</span></h3>
-        <p>Update a note.</p>
-        
-        <h4>URL Parameters</h4>
-        <div class="param">
-            <span class="param-name">id</span> <span class="param-type">(string)</span> <span class="param-required">Required</span>
-            <p>The ID of the note to update.</p>
-        </div>
-        
-        <h4>Request Body</h4>
-        <div class="param">
-            <span class="param-name">content</span> <span class="param-type">(string)</span>
-            <p>The updated content of the note.</p>
-        </div>
-        <div class="param">
-            <span class="param-name">date</span> <span class="param-type">(string)</span>
-            <p>The updated date of the note (YYYY-MM-DD format).</p>
-        </div>
-        <div class="param">
-            <span class="param-name">completed</span> <span class="param-type">(boolean)</span>
-            <p>Whether the note is completed (for todos).</p>
-        </div>
-        <div class="param">
-            <span class="param-name">time</span> <span class="param-type">(string)</span>
-            <p>The updated time of the note (HH:MM format, for reminders).</p>
-        </div>
-        <div class="param">
-            <span class="param-name">startTime</span> <span class="param-type">(string)</span>
-            <p>The updated start time of the note (HH:MM format, for blockers).</p>
-        </div>
-        <div class="param">
-            <span class="param-name">endTime</span> <span class="param-type">(string)</span>
-            <p>The updated end time of the note (HH:MM format, for blockers).</p>
-        </div>
-        
-        <h4>Response</h4>
-        <div class="response">
-            <p>Returns the updated note object.</p>
-        </div>
-    </div>
-    
-    <div class="endpoint">
-        <h3><span class="method delete">DELETE</span> <span class="url">/api/notes/:id</span></h3>
-        <p>Delete a note.</p>
-        
-        <h4>URL Parameters</h4>
-        <div class="param">
-            <span class="param-name">id</span> <span class="param-type">(string)</span> <span class="param-required">Required</span>
-            <p>The ID of the note to delete.</p>
-        </div>
-        
-        <h4>Response</h4>
-        <div class="response">
-            <p>Returns a success object.</p>
-        </div>
-        
-        <h4>Example</h4>
-        <div class="example">
-DELETE /api/notes/123456
 
-Response:
-{
-  "success": true
-}</div>
-    </div>
-    
-    <div class="endpoint">
-        <h3><span class="method get">GET</span> <span class="url">/api/calendar</span></h3>
-        <p>Get calendar events.</p>
+    <div class="section">
+        <h2>Event Endpoints</h2>
         
-        <h4>Query Parameters</h4>
-        <div class="param">
-            <span class="param-name">start</span> <span class="param-type">(string)</span>
-            <p>The start date (ISO format).</p>
+        <div class="endpoint">
+            <h3>List Events for Date</h3>
+            <span class="method get">GET</span>
+            <span class="url">/api/events/date/:date</span>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">date</span> - Date in YYYY-MM-DD format
+                </div>
+            </div>
         </div>
-        <div class="param">
-            <span class="param-name">end</span> <span class="param-type">(string)</span>
-            <p>The end date (ISO format).</p>
-        </div>
-        
-        <h4>Response</h4>
-        <div class="response">
-            <p>Returns an array of calendar event objects.</p>
-        </div>
-    </div>
-    
-    <div class="endpoint">
-        <h3><span class="method get">GET</span> <span class="url">/api/input</span></h3>
-        <p>Get input text.</p>
-        
-        <h4>Response</h4>
-        <div class="response">
-            <p>Returns an object with the input text.</p>
-        </div>
-        
-        <h4>Example</h4>
-        <div class="example">
-GET /api/input
 
-Response:
-{
-  "text": "Input text"
-}</div>
-    </div>
-    
-    <div class="endpoint">
-        <h3><span class="method post">POST</span> <span class="url">/api/input</span></h3>
-        <p>Set input text.</p>
-        
-        <h4>Request Body</h4>
-        <div class="param">
-            <span class="param-name">text</span> <span class="param-type">(string)</span> <span class="param-required">Required</span>
-            <p>The text to set as input.</p>
+        <div class="endpoint">
+            <h3>Create Event for Date</h3>
+            <span class="method post">POST</span>
+            <span class="url">/api/events/date/:date</span>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">date</span> - Date in YYYY-MM-DD format
+                </div>
+                <div class="param">
+                    <span class="param-name">Body</span> - JSON object with:
+                    <ul>
+                        <li>content (string) - Event content</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        
-        <h4>Response</h4>
-        <div class="response">
-            <p>Returns an object with the set text.</p>
-        </div>
-        
-        <h4>Example</h4>
-        <div class="example">
-POST /api/input
-Content-Type: application/json
 
-{
-  "text": "New input text"
-}
+        <div class="endpoint">
+            <h3>Delete Event</h3>
+            <span class="method delete">DELETE</span>
+            <span class="url">/api/events/:id</span>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">id</span> - Event ID
+                </div>
+            </div>
+        </div>
+    </div>
 
-Response:
-{
-  "text": "New input text"
-}</div>
-    </div>
-    
-    <div class="endpoint">
-        <h3><span class="method get">GET</span> <span class="url">/api/output</span></h3>
-        <p>Get output text.</p>
+    <div class="section">
+        <h2>Reminder Endpoints</h2>
         
-        <h4>Response</h4>
-        <div class="response">
-            <p>Returns an object with the output text.</p>
+        <div class="endpoint">
+            <h3>List Reminders for Date</h3>
+            <span class="method get">GET</span>
+            <span class="url">/api/reminders/date/:date</span>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">date</span> - Date in YYYY-MM-DD format
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <h3>Create Reminder</h3>
+            <span class="method post">POST</span>
+            <span class="url">/api/reminders/date/:date</span>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">date</span> - Date in YYYY-MM-DD format
+                </div>
+                <div class="param">
+                    <span class="param-name">Body</span> - JSON object with:
+                    <ul>
+                        <li>content (string) - Reminder content</li>
+                        <li>time (string) - Time in HH:mm format</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint">
+            <h3>Delete Reminder</h3>
+            <span class="method delete">DELETE</span>
+            <span class="url">/api/reminders/:id</span>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">id</span> - Reminder ID
+                </div>
+            </div>
         </div>
     </div>
-    
-    <div class="endpoint">
-        <h3><span class="method post">POST</span> <span class="url">/api/output</span></h3>
-        <p>Set output text.</p>
+
+    <div class="section">
+        <h2>General Endpoints</h2>
         
-        <h4>Request Body</h4>
-        <div class="param">
-            <span class="param-name">text</span> <span class="param-type">(string)</span> <span class="param-required">Required</span>
-            <p>The text to set as output.</p>
+        <div class="endpoint">
+            <h3>Get All Notes</h3>
+            <span class="method get">GET</span>
+            <span class="url">/api/notes</span>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">type</span> (optional) - Filter by note type
+                </div>
+                <div class="param">
+                    <span class="param-name">date</span> (optional) - Filter by date
+                </div>
+            </div>
         </div>
-        
-        <h4>Response</h4>
-        <div class="response">
-            <p>Returns an object with the set text.</p>
+
+        <div class="endpoint">
+            <h3>Get Calendar Events</h3>
+            <span class="method get">GET</span>
+            <span class="url">/api/calendar</span>
+            <div class="params">
+                <div class="param">
+                    <span class="param-name">start</span> (optional) - Start date
+                </div>
+                <div class="param">
+                    <span class="param-name">end</span> (optional) - End date
+                </div>
+            </div>
         </div>
     </div>
 </body>

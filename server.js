@@ -229,6 +229,125 @@ app.post('/api/output', (req, res) => {
   res.json({ text: outputText });
 });
 
+// Todo specific endpoints
+app.get('/api/todos/date/:date', (req, res) => {
+  const filterDate = new Date(req.params.date).toDateString();
+  const todos = notes.filter(note => {
+    return note.type === 'todo' && new Date(note.date).toDateString() === filterDate;
+  });
+  res.json(todos);
+});
+
+app.post('/api/todos/date/:date', (req, res) => {
+  const newTodo = {
+    id: generateId(),
+    type: 'todo',
+    date: req.params.date,
+    ...req.body,
+    createdAt: new Date().toISOString(),
+    completed: false
+  };
+  
+  notes.push(newTodo);
+  saveNotes();
+  
+  res.json(newTodo);
+});
+
+app.put('/api/todos/:id/toggle', (req, res) => {
+  const index = notes.findIndex(note => note.id === req.params.id && note.type === 'todo');
+  if (index !== -1) {
+    notes[index].completed = !notes[index].completed;
+    notes[index].updatedAt = new Date().toISOString();
+    saveNotes();
+    res.json(notes[index]);
+  } else {
+    res.status(404).json({ error: 'Todo not found' });
+  }
+});
+
+app.delete('/api/todos/:id', (req, res) => {
+  const index = notes.findIndex(note => note.id === req.params.id && note.type === 'todo');
+  if (index !== -1) {
+    notes.splice(index, 1);
+    saveNotes();
+    res.json({ success: true });
+  } else {
+    res.status(404).json({ error: 'Todo not found' });
+  }
+});
+
+// Event specific endpoints
+app.get('/api/events/date/:date', (req, res) => {
+  const filterDate = new Date(req.params.date).toDateString();
+  const events = notes.filter(note => {
+    return note.type === 'event' && new Date(note.date).toDateString() === filterDate;
+  });
+  res.json(events);
+});
+
+app.post('/api/events/date/:date', (req, res) => {
+  const newEvent = {
+    id: generateId(),
+    type: 'event',
+    date: req.params.date,
+    ...req.body,
+    createdAt: new Date().toISOString()
+  };
+  
+  notes.push(newEvent);
+  saveNotes();
+  
+  res.json(newEvent);
+});
+
+app.delete('/api/events/:id', (req, res) => {
+  const index = notes.findIndex(note => note.id === req.params.id && note.type === 'event');
+  if (index !== -1) {
+    notes.splice(index, 1);
+    saveNotes();
+    res.json({ success: true });
+  } else {
+    res.status(404).json({ error: 'Event not found' });
+  }
+});
+
+// Reminder specific endpoints
+app.get('/api/reminders/date/:date', (req, res) => {
+  const filterDate = new Date(req.params.date).toDateString();
+  const reminders = notes.filter(note => {
+    return note.type === 'reminder' && new Date(note.date).toDateString() === filterDate;
+  });
+  res.json(reminders);
+});
+
+app.post('/api/reminders/date/:date', (req, res) => {
+  const newReminder = {
+    id: generateId(),
+    type: 'reminder',
+    date: req.params.date,
+    ...req.body,
+    triggered: false,
+    createdAt: new Date().toISOString()
+  };
+  
+  notes.push(newReminder);
+  saveNotes();
+  
+  res.json(newReminder);
+});
+
+app.delete('/api/reminders/:id', (req, res) => {
+  const index = notes.findIndex(note => note.id === req.params.id && note.type === 'reminder');
+  if (index !== -1) {
+    notes.splice(index, 1);
+    saveNotes();
+    res.json({ success: true });
+  } else {
+    res.status(404).json({ error: 'Reminder not found' });
+  }
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
