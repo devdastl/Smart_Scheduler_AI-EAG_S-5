@@ -8,7 +8,7 @@ class VoiceRecognitionManager {
         this.recognition = null;
         this.isListening = false;
         this.voiceButton = document.getElementById('voice-input');
-        this.textInput = document.getElementById('input-text');
+        this.textInput = document.getElementById('smart-input');
         this.initSpeechRecognition();
         this.addEventListeners();
     }
@@ -132,12 +132,10 @@ class VoiceRecognitionManager {
 
         if (this.isListening) {
             this.voiceButton.classList.add('active');
-            this.voiceButton.querySelector('i').classList.remove('fa-microphone');
-            this.voiceButton.querySelector('i').classList.add('fa-stop');
+            this.voiceButton.innerHTML = '<i class="fas fa-stop"></i> Stop Recording';
         } else {
             this.voiceButton.classList.remove('active');
-            this.voiceButton.querySelector('i').classList.remove('fa-stop');
-            this.voiceButton.querySelector('i').classList.add('fa-microphone');
+            this.voiceButton.innerHTML = '<i class="fas fa-microphone"></i> Voice Input';
         }
     }
 }

@@ -500,6 +500,24 @@ input[type="time"] {
 }
 
 #smart-submit {
-    align-self: flex-start;
     margin-top: 10px;
+}
+
+#voice-input {
+    margin-top: 10px;
+    margin-left: 10px;
+    background-color: var(--accent-color);
+    color: white;
+}
+
+#voice-input:hover {
+    background-color: var(--secondary-color);
+}
+
+#voice-input.active {
+    background-color: var(--danger-color);
+}
+
+#voice-input.active:hover {
+    background-color: var(--warning-color);
 } 
