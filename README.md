@@ -6,12 +6,14 @@ A comprehensive note-taking web application with calendar integration, voice inp
 
 - **Modern UI Design**: Clean and responsive interface with light/dark theme support
 - **Calendar Integration**: FullCalendar integration for visualization of notes, events, and todos
-- **Multiple Note Types**: 
+- **Multiple Note Types with Dedicated Interfaces**: 
   - Todo items with checkboxes
   - Events
-  - Blockers
-  - Reminders
-- **Voice Input**: Speech-to-text functionality for easy note creation
+  - Blockers with start & end time
+  - Reminders with notification support
+- **Time Management Features**:
+  - Set time-bound blockers with start and end times
+  - Create reminders with popup notifications
 - **Filter System**: Filter notes by type
 - **API Endpoints**: Structured endpoints for integration with other applications
 
@@ -19,12 +21,22 @@ A comprehensive note-taking web application with calendar integration, voice inp
 
 The application provides the following API endpoints:
 
+### Note Management
 - `GET /api/notes` - Get all notes (with optional filtering)
 - `GET /api/notes/:id` - Get a specific note by ID
-- `POST /api/notes` - Create a new note
+- `POST /api/todos` - Create a new todo item
+- `POST /api/events` - Create a new event
+- `POST /api/blockers` - Create a new blocker with start/end times
+- `POST /api/reminders` - Create a new reminder with notification
 - `PUT /api/notes/:id` - Update an existing note
 - `DELETE /api/notes/:id` - Delete a note
+
+### Calendar
 - `GET /api/calendar` - Get calendar events
+
+### External API Interface
+- `GET /api/input` - Get the current input text
+- `POST /api/input` - Set the input text
 - `GET /api/output` - Get the current output text
 - `POST /api/output` - Set the output text
 
@@ -74,38 +86,91 @@ The application provides the following API endpoints:
 1. Double-click the `index.html` file to open it directly in your browser
    - Note: Some features like voice recognition may require a secure context (HTTPS or localhost)
 
+### Running with API Support
+
+To run the application with API support (required for LLM integration):
+
+1. Make sure you have Node.js installed
+2. Install the dependencies:
+   ```
+   cd NoteTaker
+   npm install
+   ```
+3. Start the server:
+   ```
+   npm start
+   ```
+4. Visit `http://localhost:3000` in your browser
+
+The API server will be available at `http://localhost:3000/api/*` and can be used with tools like Thunder Client or for LLM integration.
+
+API documentation is available at `http://localhost:3000/api-docs`.
+
 ## Usage Instructions
 
-1. **Adding a Note**:
-   - Type your note in the input box or use the microphone button for voice input
-   - Select the note type (Todo, Event, Blocker, or Reminder)
-   - Choose a date from the date picker
-   - Click "Save Note"
+1. **Adding Items**:
+   - Click on the corresponding button (Todo, Event, Blocker, or Reminder)
+   - Fill out the form in the modal and click Save
+   - You can also click on a date in the calendar to choose what type of item to create
 
-2. **Using the Calendar**:
-   - Navigate through months using the arrow buttons
-   - Click a date to automatically set it in the note creation form
-   - Click on events in the calendar to view details
-
-3. **Filtering Notes**:
-   - Use the "Filter" dropdown to show only specific types of notes
-
-4. **Managing Todos**:
+2. **Managing Todos**:
    - Check/uncheck the checkbox to mark todos as complete/incomplete
 
-5. **Switching Themes**:
+3. **Setting Blockers**:
+   - When creating a blocker, specify both start and end times
+   - These will appear as time-bound events in the calendar
+
+4. **Creating Reminders**:
+   - Set a time for the reminder
+   - When the time arrives, a notification will appear
+
+5. **Viewing Items**:
+   - Click on any item in the list or calendar to view its details
+   - From the details view, you can edit or delete the item
+
+6. **Filtering Items**:
+   - Use the "Filter" dropdown to show only specific types of items
+
+7. **Switching Themes**:
    - Click the moon/sun icon in the header to toggle between light and dark themes
 
-6. **Voice Input**:
-   - Click the microphone icon
-   - Speak clearly into your microphone
-   - The transcribed text will appear in the input box
-   - You can edit the transcribed text if needed
+## API Usage
+
+The API endpoints can be used to integrate with other applications:
+
+```javascript
+// Example: Creating a todo via API
+fetch('/api/todos', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    content: 'Complete project',
+    date: '2023-06-15'
+  })
+})
+.then(response => response.json())
+.then(data => console.log('Todo created:', data));
+
+// Example: Using the input/output interface
+fetch('/api/output', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    text: 'This text will appear in the output section'
+  })
+})
+.then(response => response.json())
+.then(data => console.log('Output set:', data));
+```
 
 ## Technical Details
 
 - The application uses **LocalStorage** to persist data between sessions
-- The Web Speech API is used for voice recognition
+- Reminders use browser notifications and are checked every minute
 - FullCalendar is used for calendar functionality
 - Font Awesome provides the icons
 

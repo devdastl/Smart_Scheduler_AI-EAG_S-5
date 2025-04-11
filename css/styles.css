@@ -13,6 +13,10 @@
     --border-radius: 8px;
     --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     --transition: all 0.3s ease;
+    --todo-color: #4cc9f0;
+    --event-color: #4361ee;
+    --blocker-color: #f44336;
+    --reminder-color: #ff9800;
 }
 
 .dark-theme {
@@ -101,6 +105,14 @@ main {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.feature-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
 }
 
 .btn {
@@ -131,6 +143,31 @@ main {
 
 .btn.secondary:hover {
     background-color: var(--gray-color);
+    color: white;
+}
+
+.btn.feature-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.btn.feature-btn.todo {
+    background-color: var(--todo-color);
+    color: white;
+}
+
+.btn.feature-btn.event {
+    background-color: var(--event-color);
+    color: white;
+}
+
+.btn.feature-btn.blocker {
+    background-color: var(--blocker-color);
+    color: white;
+}
+
+.btn.feature-btn.reminder {
+    background-color: var(--reminder-color);
     color: white;
 }
 
@@ -178,19 +215,43 @@ main {
     display: block;
 }
 
-.input-section, .output-section {
+.api-section {
+    background-color: var(--light-color);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+}
+
+.endpoint-info {
+    margin-top: 10px;
+    font-family: monospace;
+    background-color: var(--bg-color);
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.endpoint-info code {
+    color: var(--primary-color);
+}
+
+.output-section {
     margin-bottom: 30px;
 }
 
-.input-container {
-    position: relative;
+.form-group {
     margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
 }
 
 textarea {
     width: 100%;
-    height: 120px;
-    padding: 15px;
+    height: 100px;
+    padding: 12px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: var(--border-radius);
     resize: none;
@@ -200,26 +261,9 @@ textarea {
     color: var(--text-color);
 }
 
-#voice-input {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-}
-
-.note-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: center;
-}
-
-.note-type, .date-picker {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-select, input[type="date"] {
+input[type="date"],
+input[type="time"] {
+    width: 100%;
     padding: 8px 12px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: var(--border-radius);
@@ -227,14 +271,8 @@ select, input[type="date"] {
     color: var(--text-color);
 }
 
-.output-container {
-    min-height: 150px;
-    padding: 15px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: var(--border-radius);
-    background-color: var(--light-color);
-    color: var(--text-color);
-    overflow-y: auto;
+.notes-list {
+    min-height: 200px;
 }
 
 .modal {
@@ -253,10 +291,14 @@ select, input[type="date"] {
     margin: 10% auto;
     padding: 20px;
     border-radius: var(--border-radius);
-    width: 80%;
+    width: 90%;
     max-width: 500px;
     box-shadow: var(--box-shadow);
     position: relative;
+}
+
+.alert-modal .alert-content {
+    border-top: 4px solid var(--warning-color);
 }
 
 .close {
@@ -265,6 +307,11 @@ select, input[type="date"] {
     top: 15px;
     font-size: 24px;
     cursor: pointer;
+}
+
+.dismiss-alert {
+    margin-top: 15px;
+    width: 100%;
 }
 
 /* Calendar customization */
@@ -292,23 +339,23 @@ select, input[type="date"] {
 }
 
 .fc-event.todo {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
+    background-color: var(--todo-color);
+    border-color: var(--todo-color);
 }
 
 .fc-event.event {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
+    background-color: var(--event-color);
+    border-color: var(--event-color);
 }
 
 .fc-event.blocker {
-    background-color: var(--danger-color);
-    border-color: var(--danger-color);
+    background-color: var(--blocker-color);
+    border-color: var(--blocker-color);
 }
 
 .fc-event.reminder {
-    background-color: var(--warning-color);
-    border-color: var(--warning-color);
+    background-color: var(--reminder-color);
+    border-color: var(--reminder-color);
 }
 
 /* Note Items */
@@ -321,25 +368,31 @@ select, input[type="date"] {
 }
 
 .note-item.todo {
-    border-left: 4px solid var(--accent-color);
+    border-left: 4px solid var(--todo-color);
 }
 
 .note-item.event {
-    border-left: 4px solid var(--primary-color);
+    border-left: 4px solid var(--event-color);
 }
 
 .note-item.blocker {
-    border-left: 4px solid var(--danger-color);
+    border-left: 4px solid var(--blocker-color);
 }
 
 .note-item.reminder {
-    border-left: 4px solid var(--warning-color);
+    border-left: 4px solid var(--reminder-color);
 }
 
 .note-date {
     font-size: 12px;
     color: var(--gray-color);
     margin-bottom: 5px;
+}
+
+.note-time {
+    font-size: 12px;
+    color: var(--gray-color);
+    margin-left: 10px;
 }
 
 .note-actions {
@@ -369,4 +422,38 @@ select, input[type="date"] {
 .note-item.completed .note-content {
     text-decoration: line-through;
     opacity: 0.7;
+}
+
+.note-detail {
+    padding: 10px;
+    border-radius: var(--border-radius);
+    margin-bottom: 15px;
+}
+
+.note-detail.todo {
+    background-color: rgba(76, 201, 240, 0.1);
+}
+
+.note-detail.event {
+    background-color: rgba(67, 97, 238, 0.1);
+}
+
+.note-detail.blocker {
+    background-color: rgba(244, 67, 54, 0.1);
+}
+
+.note-detail.reminder {
+    background-color: rgba(255, 152, 0, 0.1);
+}
+
+.note-actions-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.no-notes {
+    text-align: center;
+    color: var(--gray-color);
+    padding: 20px;
 } 

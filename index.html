@@ -24,7 +24,12 @@
 
             <div class="notes-container">
                 <div class="actions">
-                    <button id="new-note" class="btn primary"><i class="fas fa-plus"></i> New Note</button>
+                    <div class="feature-buttons">
+                        <button id="add-todo" class="btn feature-btn todo"><i class="fas fa-check-square"></i> Todo</button>
+                        <button id="add-event" class="btn feature-btn event"><i class="fas fa-calendar-day"></i> Event</button>
+                        <button id="add-blocker" class="btn feature-btn blocker"><i class="fas fa-ban"></i> Blocker</button>
+                        <button id="add-reminder" class="btn feature-btn reminder"><i class="fas fa-bell"></i> Reminder</button>
+                    </div>
                     <div class="dropdown">
                         <button class="btn secondary dropdown-toggle">
                             <i class="fas fa-filter"></i> Filter
@@ -39,45 +44,128 @@
                     </div>
                 </div>
 
-                <div class="input-section">
-                    <h2>Create Note</h2>
-                    <div class="input-container">
-                        <textarea id="input-text" placeholder="Type your note here..."></textarea>
-                        <button id="voice-input" class="btn circle">
-                            <i class="fas fa-microphone"></i>
-                        </button>
-                    </div>
-                    <div class="note-options">
-                        <div class="note-type">
-                            <label for="note-type">Type:</label>
-                            <select id="note-type">
-                                <option value="todo">Todo</option>
-                                <option value="event">Event</option>
-                                <option value="blocker">Blocker</option>
-                                <option value="reminder">Reminder</option>
-                            </select>
-                        </div>
-                        <div class="date-picker">
-                            <label for="note-date">Date:</label>
-                            <input type="date" id="note-date">
-                        </div>
-                        <button id="save-note" class="btn primary">Save Note</button>
+                <div class="api-section">
+                    <h2>API Interface</h2>
+                    <p>This section is accessible only via API endpoints. See documentation for details.</p>
+                    <div class="endpoint-info">
+                        <div><strong>Input Endpoint:</strong> <code>/api/input</code></div>
+                        <div><strong>Output Endpoint:</strong> <code>/api/output</code></div>
                     </div>
                 </div>
 
                 <div class="output-section">
-                    <h2>Output</h2>
-                    <div id="output-text" class="output-container"></div>
+                    <h2>Notes</h2>
+                    <div class="notes-list"></div>
                 </div>
             </div>
         </main>
     </div>
 
-    <div id="modal" class="modal">
+    <!-- Modals -->
+    <!-- Todo Modal -->
+    <div id="todo-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2 id="modal-title">Add Note</h2>
+            <h2>Add Todo</h2>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="todo-content">Content:</label>
+                    <textarea id="todo-content" placeholder="Enter your todo..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="todo-date">Date:</label>
+                    <input type="date" id="todo-date">
+                </div>
+                <button id="save-todo" class="btn primary">Save Todo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Modal -->
+    <div id="event-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add Event</h2>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="event-content">Content:</label>
+                    <textarea id="event-content" placeholder="Enter event details..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="event-date">Date:</label>
+                    <input type="date" id="event-date">
+                </div>
+                <button id="save-event" class="btn primary">Save Event</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blocker Modal -->
+    <div id="blocker-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add Blocker</h2>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="blocker-content">Content:</label>
+                    <textarea id="blocker-content" placeholder="Enter blocker details..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="blocker-date">Date:</label>
+                    <input type="date" id="blocker-date">
+                </div>
+                <div class="form-group">
+                    <label for="blocker-start-time">Start Time:</label>
+                    <input type="time" id="blocker-start-time">
+                </div>
+                <div class="form-group">
+                    <label for="blocker-end-time">End Time:</label>
+                    <input type="time" id="blocker-end-time">
+                </div>
+                <button id="save-blocker" class="btn primary">Save Blocker</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reminder Modal -->
+    <div id="reminder-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add Reminder</h2>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="reminder-content">Content:</label>
+                    <textarea id="reminder-content" placeholder="Enter reminder..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="reminder-date">Date:</label>
+                    <input type="date" id="reminder-date">
+                </div>
+                <div class="form-group">
+                    <label for="reminder-time">Time:</label>
+                    <input type="time" id="reminder-time">
+                </div>
+                <button id="save-reminder" class="btn primary">Save Reminder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Note Detail Modal -->
+    <div id="note-detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modal-title">Note Details</h2>
             <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Reminder Alert Modal -->
+    <div id="reminder-alert" class="modal alert-modal">
+        <div class="modal-content alert-content">
+            <span class="close">&times;</span>
+            <h2>Reminder!</h2>
+            <div id="reminder-alert-content"></div>
+            <button class="btn primary dismiss-alert">Dismiss</button>
         </div>
     </div>
 

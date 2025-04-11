@@ -68,7 +68,9 @@ class CalendarManager {
         
         api.getNoteById(eventId)
             .then(note => {
-                this.showNoteDetail(note);
+                if (notesManager) {
+                    notesManager.showNoteDetail(note);
+                }
             })
             .catch(error => {
                 console.error('Error fetching note:', error);
@@ -76,130 +78,84 @@ class CalendarManager {
     }
 
     /**
-     * Show note detail in modal
-     * @param {Object} note - Note object
-     */
-    showNoteDetail(note) {
-        const modal = document.getElementById('modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalBody = document.getElementById('modal-body');
-
-        // Set modal title
-        modalTitle.textContent = this.getModalTitleByType(note.type);
-
-        // Create modal content
-        let content = `
-            <div class="note-detail ${note.type}">
-                <div class="note-date">${this.formatDate(note.date)}</div>
-                <div class="note-content">${note.content}</div>
-                <div class="note-actions-container">
-                    <button class="btn primary edit-note" data-id="${note.id}">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
-                    <button class="btn secondary delete-note" data-id="${note.id}">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
-                </div>
-            </div>
-        `;
-
-        // If it's a todo, add a checkbox
-        if (note.type === 'todo') {
-            const isChecked = note.completed ? 'checked' : '';
-            content = `
-                <div class="note-detail ${note.type}">
-                    <div class="note-date">${this.formatDate(note.date)}</div>
-                    <div class="todo-container">
-                        <input type="checkbox" class="todo-checkbox" ${isChecked} data-id="${note.id}">
-                        <div class="note-content ${note.completed ? 'completed' : ''}">${note.content}</div>
-                    </div>
-                    <div class="note-actions-container">
-                        <button class="btn primary edit-note" data-id="${note.id}">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="btn secondary delete-note" data-id="${note.id}">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        modalBody.innerHTML = content;
-
-        // Add event listeners for edit and delete buttons
-        const editBtn = modalBody.querySelector('.edit-note');
-        const deleteBtn = modalBody.querySelector('.delete-note');
-        const todoCheckbox = modalBody.querySelector('.todo-checkbox');
-
-        if (editBtn) {
-            editBtn.addEventListener('click', () => {
-                this.editNote(note);
-                modal.style.display = 'none';
-            });
-        }
-
-        if (deleteBtn) {
-            deleteBtn.addEventListener('click', () => {
-                this.deleteNote(note.id);
-                modal.style.display = 'none';
-            });
-        }
-
-        if (todoCheckbox) {
-            todoCheckbox.addEventListener('change', (e) => {
-                this.toggleTodoStatus(note.id, e.target.checked);
-            });
-        }
-
-        // Show modal
-        modal.style.display = 'block';
-
-        // Add close button functionality
-        const closeBtn = modal.querySelector('.close');
-        closeBtn.onclick = function() {
-            modal.style.display = 'none';
-        };
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        };
-    }
-
-    /**
      * Handle date click
      * @param {Object} info - Date info from FullCalendar
      */
     handleDateClick(info) {
-        // Set the date in the note creation form
-        const dateInput = document.getElementById('note-date');
-        if (dateInput) {
-            dateInput.value = info.dateStr;
+        // Determine if we should ask which type of item to create
+        const modal = document.getElementById('todo-modal');
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'date-selection-buttons';
+        buttonContainer.innerHTML = `
+            <p>What would you like to create?</p>
+            <div class="buttons">
+                <button class="btn feature-btn todo" data-type="todo">Todo</button>
+                <button class="btn feature-btn event" data-type="event">Event</button>
+                <button class="btn feature-btn blocker" data-type="blocker">Blocker</button>
+                <button class="btn feature-btn reminder" data-type="reminder">Reminder</button>
+            </div>
+        `;
+        
+        // Create and show a modal for selecting item type
+        const dateSelectionModal = document.getElementById('note-detail-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        
+        if (dateSelectionModal && modalTitle && modalBody) {
+            modalTitle.textContent = `Add Item on ${this.formatDate(info.dateStr)}`;
+            modalBody.innerHTML = '';
+            modalBody.appendChild(buttonContainer);
+            
+            // Add click event listeners to buttons
+            const buttons = buttonContainer.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    dateSelectionModal.style.display = 'none';
+                    
+                    const type = button.getAttribute('data-type');
+                    let typeModal;
+                    
+                    // Set the date in the appropriate modal
+                    switch (type) {
+                        case 'todo':
+                            typeModal = document.getElementById('todo-modal');
+                            document.getElementById('todo-date').value = info.dateStr;
+                            break;
+                        case 'event':
+                            typeModal = document.getElementById('event-modal');
+                            document.getElementById('event-date').value = info.dateStr;
+                            break;
+                        case 'blocker':
+                            typeModal = document.getElementById('blocker-modal');
+                            document.getElementById('blocker-date').value = info.dateStr;
+                            break;
+                        case 'reminder':
+                            typeModal = document.getElementById('reminder-modal');
+                            document.getElementById('reminder-date').value = info.dateStr;
+                            break;
+                    }
+                    
+                    if (typeModal && notesManager) {
+                        notesManager.openModal(typeModal);
+                    }
+                });
+            });
+            
+            dateSelectionModal.style.display = 'block';
+            
+            // Add close button functionality
+            const closeBtn = dateSelectionModal.querySelector('.close');
+            closeBtn.onclick = function() {
+                dateSelectionModal.style.display = 'none';
+            };
+            
+            // Close when clicking outside
+            window.onclick = function(event) {
+                if (event.target === dateSelectionModal) {
+                    dateSelectionModal.style.display = 'none';
+                }
+            };
         }
-
-        // Focus on the input text area
-        const inputText = document.getElementById('input-text');
-        if (inputText) {
-            inputText.focus();
-        }
-    }
-
-    /**
-     * Get modal title based on note type
-     * @param {String} type - Note type
-     * @returns {String} - Modal title
-     */
-    getModalTitleByType(type) {
-        const titles = {
-            todo: 'Todo Item',
-            event: 'Event',
-            blocker: 'Blocker',
-            reminder: 'Reminder'
-        };
-        return titles[type] || 'Note Detail';
     }
 
     /**
@@ -210,59 +166,6 @@ class CalendarManager {
     formatDate(dateString) {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateString).toLocaleDateString(undefined, options);
-    }
-
-    /**
-     * Edit note
-     * @param {Object} note - Note to edit
-     */
-    editNote(note) {
-        // Set form values
-        const inputText = document.getElementById('input-text');
-        const noteType = document.getElementById('note-type');
-        const noteDate = document.getElementById('note-date');
-        
-        if (inputText) inputText.value = note.content;
-        if (noteType) noteType.value = note.type;
-        if (noteDate) {
-            // Convert date to YYYY-MM-DD format for the date input
-            const date = new Date(note.date);
-            const formattedDate = date.toISOString().split('T')[0];
-            noteDate.value = formattedDate;
-        }
-
-        // Store the note ID for updating
-        document.getElementById('save-note').setAttribute('data-edit-id', note.id);
-    }
-
-    /**
-     * Delete note
-     * @param {String} id - Note ID
-     */
-    deleteNote(id) {
-        api.deleteNote(id)
-            .then(() => {
-                this.refreshCalendar();
-                notesManager.refreshNotesList();
-            })
-            .catch(error => {
-                console.error('Error deleting note:', error);
-            });
-    }
-
-    /**
-     * Toggle todo status
-     * @param {String} id - Note ID
-     * @param {Boolean} completed - Completed status
-     */
-    toggleTodoStatus(id, completed) {
-        api.updateNote(id, { completed })
-            .then(() => {
-                this.refreshCalendar();
-            })
-            .catch(error => {
-                console.error('Error updating todo status:', error);
-            });
     }
 
     /**
