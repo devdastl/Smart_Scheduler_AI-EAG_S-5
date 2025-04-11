@@ -60,6 +60,15 @@ app.get('/api/notes', (req, res) => {
     });
   }
   
+  // Filter by updatedSince if provided (for polling)
+  if (req.query.updatedSince) {
+    const updatedSince = new Date(req.query.updatedSince);
+    filteredNotes = filteredNotes.filter(note => {
+      const noteUpdatedAt = note.updatedAt ? new Date(note.updatedAt) : new Date(note.createdAt);
+      return noteUpdatedAt > updatedSince;
+    });
+  }
+  
   res.json(filteredNotes);
 });
 
@@ -75,11 +84,13 @@ app.get('/api/notes/:id', (req, res) => {
 
 // POST /api/todos
 app.post('/api/todos', (req, res) => {
+  const now = new Date().toISOString();
   const newTodo = {
     id: generateId(),
     type: 'todo',
     ...req.body,
-    createdAt: new Date().toISOString(),
+    createdAt: now,
+    updatedAt: now,
     completed: false
   };
   
@@ -91,11 +102,13 @@ app.post('/api/todos', (req, res) => {
 
 // POST /api/events
 app.post('/api/events', (req, res) => {
+  const now = new Date().toISOString();
   const newEvent = {
     id: generateId(),
     type: 'event',
     ...req.body,
-    createdAt: new Date().toISOString()
+    createdAt: now,
+    updatedAt: now
   };
   
   notes.push(newEvent);
@@ -106,11 +119,13 @@ app.post('/api/events', (req, res) => {
 
 // POST /api/blockers
 app.post('/api/blockers', (req, res) => {
+  const now = new Date().toISOString();
   const newBlocker = {
     id: generateId(),
     type: 'blocker',
     ...req.body,
-    createdAt: new Date().toISOString()
+    createdAt: now,
+    updatedAt: now
   };
   
   notes.push(newBlocker);
@@ -121,12 +136,14 @@ app.post('/api/blockers', (req, res) => {
 
 // POST /api/reminders
 app.post('/api/reminders', (req, res) => {
+  const now = new Date().toISOString();
   const newReminder = {
     id: generateId(),
     type: 'reminder',
     ...req.body,
     triggered: false,
-    createdAt: new Date().toISOString()
+    createdAt: now,
+    updatedAt: now
   };
   
   notes.push(newReminder);
@@ -159,9 +176,10 @@ app.put('/api/notes/:id', (req, res) => {
 app.delete('/api/notes/:id', (req, res) => {
   const index = notes.findIndex(note => note.id === req.params.id);
   if (index !== -1) {
+    const deletedNote = notes[index];
     notes.splice(index, 1);
     saveNotes();
-    res.json({ success: true });
+    res.json(deletedNote);
   } else {
     res.status(404).json({ error: 'Note not found' });
   }

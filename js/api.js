@@ -8,10 +8,14 @@ class ApiService {
         this.baseUrl = window.location.origin;
         this.notes = [];
         this.reminders = [];
+        this.eventListeners = new Map();
+        this.lastUpdateTime = new Date().toISOString();
+        this.pollingInterval = null;
         this.initializeRoutes();
         this.loadNotes();
         this.initializeReminders();
         this.startReminderChecker();
+        this.startPolling();
     }
 
     /**
@@ -51,6 +55,7 @@ class ApiService {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             this.notes = await response.json();
+            this.lastUpdateTime = new Date().toISOString();
         } catch (error) {
             console.error('Error loading notes:', error);
             // Fallback to localStorage if API is not available
@@ -254,22 +259,12 @@ class ApiService {
             
             const newTodo = await response.json();
             this.notes.push(newTodo);
+            this._saveNotes();
+            this.emit('noteCreated', newTodo);
             return newTodo;
         } catch (error) {
             console.error('Error creating todo:', error);
-            // Fallback to local creation if API fails
-            const newTodo = {
-                id: this._generateId(),
-                type: 'todo',
-                ...todoData,
-                createdAt: new Date().toISOString(),
-                completed: false
-            };
-            
-            this.notes.push(newTodo);
-            this._saveNotes();
-            
-            return newTodo;
+            throw error;
         }
     }
 
@@ -429,43 +424,16 @@ class ApiService {
             }
             
             const updatedNote = await response.json();
-            
-            // Update local notes
             const index = this.notes.findIndex(note => note.id === id);
             if (index !== -1) {
                 this.notes[index] = updatedNote;
+                this._saveNotes();
+                this.emit('noteUpdated', updatedNote);
             }
-            
-            // If it's a reminder that's been updated, we need to update the reminders list
-            if (updatedNote.type === 'reminder') {
-                this.initializeReminders();
-            }
-            
             return updatedNote;
         } catch (error) {
             console.error('Error updating note:', error);
-            // Fallback to local update if API fails
-            const index = this.notes.findIndex(note => note.id === id);
-            if (index !== -1) {
-                const oldNote = this.notes[index];
-                const updatedNote = {
-                    ...oldNote,
-                    ...noteData,
-                    updatedAt: new Date().toISOString()
-                };
-                
-                this.notes[index] = updatedNote;
-                this._saveNotes();
-                
-                // If it's a reminder that's been updated, we need to update the reminders list
-                if (oldNote.type === 'reminder') {
-                    this.initializeReminders();
-                }
-                
-                return updatedNote;
-            } else {
-                throw new Error('Note not found');
-            }
+            throw error;
         }
     }
 
@@ -484,43 +452,21 @@ class ApiService {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
+            // Get the deleted note from the response
+            const deletedNote = await response.json();
+            
             // Remove from local notes
             const index = this.notes.findIndex(note => note.id === id);
             if (index !== -1) {
-                const deletedNote = this.notes[index];
                 this.notes.splice(index, 1);
-                
-                // If it's a reminder, remove from reminders list
-                if (deletedNote.type === 'reminder') {
-                    const reminderIndex = this.reminders.findIndex(r => r.id === id);
-                    if (reminderIndex !== -1) {
-                        this.reminders.splice(reminderIndex, 1);
-                    }
-                }
+                this._saveNotes();
+                this.emit('noteDeleted', deletedNote);
             }
             
             return true;
         } catch (error) {
             console.error('Error deleting note:', error);
-            // Fallback to local deletion if API fails
-            const index = this.notes.findIndex(note => note.id === id);
-            if (index !== -1) {
-                const deletedNote = this.notes[index];
-                this.notes.splice(index, 1);
-                this._saveNotes();
-                
-                // If it's a reminder, remove from reminders list
-                if (deletedNote.type === 'reminder') {
-                    const reminderIndex = this.reminders.findIndex(r => r.id === id);
-                    if (reminderIndex !== -1) {
-                        this.reminders.splice(reminderIndex, 1);
-                    }
-                }
-                
-                return true;
-            } else {
-                throw new Error('Note not found');
-            }
+            throw error;
         }
     }
 
@@ -716,6 +662,101 @@ class ApiService {
      */
     _saveNotes() {
         localStorage.setItem('notes', JSON.stringify(this.notes));
+    }
+
+    // Add event emitter methods
+    on(event, callback) {
+        if (!this.eventListeners.has(event)) {
+            this.eventListeners.set(event, []);
+        }
+        this.eventListeners.get(event).push(callback);
+    }
+
+    emit(event, data) {
+        if (this.eventListeners.has(event)) {
+            this.eventListeners.get(event).forEach(callback => callback(data));
+        }
+    }
+
+    /**
+     * Start polling for updates
+     */
+    startPolling() {
+        // Poll every 2 seconds
+        this.pollingInterval = setInterval(() => {
+            this.pollForUpdates();
+        }, 2000);
+    }
+
+    /**
+     * Stop polling
+     */
+    stopPolling() {
+        if (this.pollingInterval) {
+            clearInterval(this.pollingInterval);
+            this.pollingInterval = null;
+        }
+    }
+
+    /**
+     * Poll for updates from the server
+     */
+    async pollForUpdates() {
+        try {
+            // Get notes with a filter for updates since last poll
+            const queryParams = new URLSearchParams();
+            queryParams.append('updatedSince', this.lastUpdateTime);
+            
+            const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+            const response = await fetch(`${this.routes.getNotes}${queryString}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const updatedNotes = await response.json();
+            
+            // Process updates
+            if (updatedNotes && updatedNotes.length > 0) {
+                // Update local notes
+                updatedNotes.forEach(updatedNote => {
+                    const index = this.notes.findIndex(note => note.id === updatedNote.id);
+                    
+                    if (index !== -1) {
+                        // Note exists, update it
+                        this.notes[index] = updatedNote;
+                        this.emit('noteUpdated', updatedNote);
+                    } else {
+                        // New note
+                        this.notes.push(updatedNote);
+                        this.emit('noteCreated', updatedNote);
+                    }
+                });
+                
+                // Check for deleted notes
+                const updatedIds = updatedNotes.map(note => note.id);
+                const deletedNotes = this.notes.filter(note => !updatedIds.includes(note.id));
+                
+                deletedNotes.forEach(deletedNote => {
+                    const index = this.notes.findIndex(note => note.id === deletedNote.id);
+                    if (index !== -1) {
+                        this.notes.splice(index, 1);
+                        this.emit('noteDeleted', deletedNote);
+                    }
+                });
+                
+                // Update last update time
+                this.lastUpdateTime = new Date().toISOString();
+                
+                // Save to localStorage
+                this._saveNotes();
+                
+                // Reinitialize reminders if needed
+                this.initializeReminders();
+            }
+        } catch (error) {
+            console.error('Error polling for updates:', error);
+        }
     }
 }
 

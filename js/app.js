@@ -9,6 +9,7 @@ class NotesManager {
         this.initElements();
         this.addEventListeners();
         this.refreshNotesList();
+        this.setupApiEventListeners();
     }
 
     /**
@@ -243,25 +244,19 @@ class NotesManager {
             api.updateNote(editId, todoData)
                 .then(() => {
                     this.closeAllModals();
-                    this.refreshNotesList();
-                    if (calendarManager) {
-                        calendarManager.refreshCalendar();
-                    }
                 })
                 .catch(error => {
                     console.error('Error updating todo:', error);
+                    alert('Failed to update todo. Please try again.');
                 });
         } else {
             api.createTodo(todoData)
                 .then(() => {
                     this.closeAllModals();
-                    this.refreshNotesList();
-                    if (calendarManager) {
-                        calendarManager.refreshCalendar();
-                    }
                 })
                 .catch(error => {
                     console.error('Error creating todo:', error);
+                    alert('Failed to create todo. Please try again.');
                 });
         }
     }
@@ -730,16 +725,21 @@ class NotesManager {
      * @param {String} id - Note ID
      */
     deleteNote(id) {
-        api.deleteNote(id)
-            .then(() => {
-                this.refreshNotesList();
-                if (calendarManager) {
-                    calendarManager.refreshCalendar();
-                }
-            })
-            .catch(error => {
-                console.error('Error deleting note:', error);
-            });
+        if (confirm('Are you sure you want to delete this note?')) {
+            api.deleteNote(id)
+                .then(() => {
+                    // The UI will be updated by the event listener
+                    // But we can also refresh the notes list to be sure
+                    this.refreshNotesList();
+                    if (calendarManager) {
+                        calendarManager.refreshCalendar();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting note:', error);
+                    alert('Failed to delete note. Please try again.');
+                });
+        }
     }
 
     /**
@@ -749,14 +749,9 @@ class NotesManager {
      */
     toggleTodoStatus(id, completed) {
         api.updateNote(id, { completed })
-            .then(() => {
-                this.refreshNotesList();
-                if (calendarManager) {
-                    calendarManager.refreshCalendar();
-                }
-            })
             .catch(error => {
                 console.error('Error updating todo status:', error);
+                alert('Failed to update todo status. Please try again.');
             });
     }
 
@@ -798,6 +793,32 @@ class NotesManager {
             icon.classList.remove('fa-moon');
             icon.classList.add('fa-sun');
         }
+    }
+
+    setupApiEventListeners() {
+        // Listen for note creation events
+        api.on('noteCreated', (note) => {
+            this.refreshNotesList();
+            if (calendarManager) {
+                calendarManager.refreshCalendar();
+            }
+        });
+
+        // Listen for note update events
+        api.on('noteUpdated', (note) => {
+            this.refreshNotesList();
+            if (calendarManager) {
+                calendarManager.refreshCalendar();
+            }
+        });
+
+        // Listen for note deletion events
+        api.on('noteDeleted', (note) => {
+            this.refreshNotesList();
+            if (calendarManager) {
+                calendarManager.refreshCalendar();
+            }
+        });
     }
 }
 
