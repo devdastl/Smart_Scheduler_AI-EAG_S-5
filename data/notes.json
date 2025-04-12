@@ -1,10 +1,36 @@
 [
   {
-    "id": "m9eaig5z0z8iq",
+    "id": "m9eecxyz671kz",
+    "type": "event",
+    "date": "2025-04-14",
+    "content": "Wife's Birthday",
+    "createdAt": "2025-04-12T15:54:56.123Z"
+  },
+  {
+    "id": "m9eecyky8odxl",
     "type": "todo",
-    "date": "2025-04-12",
-    "content": "wash my cloth",
-    "createdAt": "2025-04-12T14:07:14.519Z",
-    "completed": false
+    "date": "2025-04-13",
+    "content": "Buy gifts for wife",
+    "createdAt": "2025-04-12T15:54:56.914Z",
+    "completed": true,
+    "updatedAt": "2025-04-12T15:56:28.626Z"
+  },
+  {
+    "id": "m9eecz6ww965p",
+    "type": "todo",
+    "date": "2025-04-13",
+    "content": "Buy a cake for wife",
+    "createdAt": "2025-04-12T15:54:57.704Z",
+    "completed": true,
+    "updatedAt": "2025-04-12T15:56:29.386Z"
+  },
+  {
+    "id": "m9eeczu2h7ae5",
+    "type": "reminder",
+    "date": "2025-04-13",
+    "content": "Wish wife happy birthday",
+    "time": "00:00",
+    "triggered": false,
+    "createdAt": "2025-04-12T15:54:58.538Z"
   }
 ]

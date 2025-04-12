@@ -15,6 +15,12 @@ mcp = FastMCP("NoteTaker")
 
 # DEFINE TOOLS
 
+#get current time
+@mcp.tool()
+def get_current_time() -> str:
+    """Get the current time in HH:MM format """
+    return datetime.now().strftime("%H:%M")
+
 # get current date
 @mcp.tool()
 def get_current_date() -> str:

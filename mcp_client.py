@@ -23,6 +23,14 @@ iteration_response = []
 user_prompt = ""
 
 
+#clean LLM response
+def clean_code_block(text):
+    if text.startswith("```json"):
+        text = text[len("```json"):]
+    if text.endswith("```"):
+        text = text[:-3]
+    return text.strip()
+
 #send LLM final response back to UI
 def send_to_ui(text):
     """
@@ -178,6 +186,8 @@ async def main():
                     try:
                         response = await generate_with_timeout(client, prompt)
                         response_text = response.text.strip()
+                        response_text = clean_code_block(response_text)
+                        print(response_text)
                         response_text = json.loads(response_text)
                         print(f"LLM Response: {response_text}")
                         
