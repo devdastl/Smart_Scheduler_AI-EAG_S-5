@@ -160,8 +160,6 @@ async def main():
                 query = user_prompt
                 
                 print("Starting iteration loop...")
-                print(system_prompt)
-                print(query)
                 
                 # Use global iteration variables
                 global iteration, last_response

@@ -1,20 +1,10 @@
 [
   {
-    "id": "m9e6u8k724a87",
-    "type": "reminder",
+    "id": "m9eaig5z0z8iq",
+    "type": "todo",
     "date": "2025-04-12",
-    "content": "Morning reminder",
-    "time": "06:30",
-    "triggered": false,
-    "createdAt": "2025-04-12T12:24:26.071Z"
-  },
-  {
-    "id": "m9e6u9gdvgwz7",
-    "type": "reminder",
-    "date": "2025-04-12",
-    "content": "Evening reminder",
-    "time": "19:30",
-    "triggered": false,
-    "createdAt": "2025-04-12T12:24:27.229Z"
+    "content": "wash my cloth",
+    "createdAt": "2025-04-12T14:07:14.519Z",
+    "completed": false
   }
 ]
