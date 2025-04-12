@@ -122,6 +122,15 @@ Defined in `mcp_server.py`:
 
 ---
 
+## 🔮 Future Enhancements
+
+
+1. 🔗 **Unified Integration** – Tighter integration between calendar, notes, and LLM responses for a more seamless experience.
+2. 🕒 **Time-aware Task Creation** – Enhanced natural language support for time-specific creation of todos and events (e.g., “remind me to call John at 3 PM”).
+3. 🧵 **Linked Entities** – Ability to **link todos, events, reminders, and blockers** together so related items can reference each other contextually.
+4. 🧠 **Context-Aware Suggestions** – LLM-driven recommendations based on historical activity and context (e.g., suggest break blocks or reschedule conflicting items).
+---
+
 ### 📚 Additional Info
 
 - 📑 **API Docs**: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
