@@ -274,7 +274,8 @@ app.post('/api/execute-python', (req, res) => {
   
   // Set the NOTETAKER_SERVER_URL environment variable so the Python script knows where to send its results
   const serverUrl = `http://localhost:${port}`;
-  const command = `NOTETAKER_SERVER_URL=${serverUrl} python mcp_client.py "${text}"`;
+  const gnome_command = `'source env/bin/activate; NOTETAKER_SERVER_URL=${serverUrl} python mcp_client.py "${text}"; exec bash'`
+  const command = `gnome-terminal -- bash -c ${gnome_command}`;
   
   exec(command, (error, stdout, stderr) => {
     if (error) {

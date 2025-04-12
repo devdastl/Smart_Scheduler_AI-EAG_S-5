@@ -1,20 +1,20 @@
 [
   {
-    "id": "m9cxnt71fdmx0",
+    "id": "m9e6u8k724a87",
     "type": "reminder",
-    "date": "2025-04-15",
-    "content": "creating a reminder from mcp server",
-    "time": "12:50",
+    "date": "2025-04-12",
+    "content": "Morning reminder",
+    "time": "06:30",
     "triggered": false,
-    "createdAt": "2025-04-11T15:19:43.501Z"
+    "createdAt": "2025-04-12T12:24:26.071Z"
   },
   {
-    "id": "m9d5cucntuae7",
-    "type": "todo",
+    "id": "m9e6u9gdvgwz7",
+    "type": "reminder",
     "date": "2025-04-12",
-    "content": "clean my keyboard",
-    "createdAt": "2025-04-11T18:55:08.711Z",
-    "completed": true,
-    "updatedAt": "2025-04-11T19:02:02.634Z"
+    "content": "Evening reminder",
+    "time": "19:30",
+    "triggered": false,
+    "createdAt": "2025-04-12T12:24:27.229Z"
   }
 ]

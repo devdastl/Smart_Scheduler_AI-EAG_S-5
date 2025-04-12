@@ -8,24 +8,55 @@ from google import genai
 from concurrent.futures import TimeoutError
 from functools import partial
 import json
+from system_prompt_template import system_prompt
+import requests
 
 # Access your API key and initialize Gemini client correctly
 load_dotenv("token.env")
 api_key = os.getenv("API_TOKEN")
 client = genai.Client(api_key=api_key)
 
-max_iterations = 10
+max_iterations = 15
 last_response = None
 iteration = 0
 iteration_response = []
 user_prompt = ""
+
+
+#send LLM final response back to UI
+def send_to_ui(text):
+    """
+    Send the processed text to the API endpoint
+    """
+    # Get the server URL from environment or use default
+    server_url = os.environ.get('NOTETAKER_SERVER_URL', 'http://localhost:3000')
+    api_endpoint = f"{server_url}/api/smart-output"
+    
+    try:
+        # Send the text to the API
+        response = requests.post(
+            api_endpoint,
+            json={"text": text},
+            headers={"Content-Type": "application/json"}
+        )
+        
+        # Check if the request was successful
+        if response.status_code == 200:
+            print(f"Successfully sent text to API: {response.json()}")
+            return True
+        else:
+            print(f"Error sending text to API: {response.status_code} - {response.text}")
+            return False
+    except Exception as e:
+        print(f"Exception when sending to API: {str(e)}")
+        return False
 
 if len(sys.argv) < 2:
     print("Error: No user prompt provided")
     sys.exit(1)
     
     # Get the input text from command-line arguments
-    user_prompt = sys.argv[1]
+user_prompt = sys.argv[1]
 
 async def generate_with_timeout(client, prompt, timeout=10):
     """Generate content with a timeout"""
@@ -124,48 +155,13 @@ async def main():
                     tools_description = "Error loading tools"
                 
                 print("Created system prompt...")
-                system_prompt = """You are personalized agent who is expert in understanding user query and help him to plan his day.
-You have access to a day planning system where you can handle **todos**, **events** and **reminders**. This system has multiple tools whose description is mentioned below which you can call once at a time.
-
-Available tools:
-_tools_description_
-
-You have to understand the user query and based on that, think step-by-step and reason through what actions are required. **Tag each step implicitly with the type of reasoning involved**, such as "intent recognition", "date parsing", "lookup", or "planning". Then, choose the most appropriate tool for each step.
-After calling a tool, **check if the response contains the expected information or format**. If it seems invalid, incomplete, or inconsistent, make another tool call to clarify, correct, or gather missing data before proceeding.
-
-If a tool fails (returns `None`, errors, or an unexpected structure):
-- Retry or call a fallback tool
-- For missing or unclear user intent → call `clarify_intent` if available
-- For bad or missing date values → call `get_current_date` or `validate_date_format`
-- For ambiguous tool output → call `verify_tool_output` if available
-
-You must respond with EXACTLY ONE line as a valid json object in the following format:
-'{"final_iteration": "True/False", "your_comment": "your_comment", "function_name": "name-of-function-to-call", "parameters": [param1, param2, ...]}'
-
-Above json object is a valid json object and below are meanings of keys:
-1. `final_iteration`: Provide "True" if you have thought through the task and completed the task assigned to you. Otherwise, "False". **DO NOT CALL ANY FUNCTION** when this is **True**.
-2. `your_comment`: Only fill this field on the **final_iteration** being **True** to summarize what was done. Leave it blank otherwise.
-3. `function_name`: Name of the tool to call (from the available tools list).
-4. `parameters`: A list of values passed to the tool.
-
-**MAKE SURE TO CALL ONE TOOL AT A TIME.**
-
-This system’s tools return values as dicts, lists of dicts, or strings. Be sure to parse them carefully and only use them when verified for the next tool call.
-
-
-**EXAMPLE**
-User query: Need to buy groceries tomorrow
-'{"final_iteration": "False", "your_comment": "", "function_name": "get_current_date", "parameters": []}' 
-'{"final_iteration": "False", "your_comment": "", "function_name": "list_todo", "parameters": ["buy groceries", "2025-04-12"]}'
-'{"final_iteration": "True", "your_comment": "Created a todo for buy groceries on 12th April 2025", "function_name": "", "parameters": []}'
-
-
-DO NOT include any explanations or additional text apart from the json object. Don't add ```json or ``` at the beginning or end of your response.
-
-""".replace("_tools_description_", tools_description)
+                global system_prompt
+                system_prompt = system_prompt.replace("_tools_description_", tools_description)
                 query = user_prompt
                 
                 print("Starting iteration loop...")
+                print(system_prompt)
+                print(query)
                 
                 # Use global iteration variables
                 global iteration, last_response
@@ -300,6 +296,8 @@ DO NOT include any explanations or additional text apart from the json object. D
                     elif response_text["final_iteration"] == "True":
                         print("\n=== Agent Execution Complete ===")
                         print(f"\n=== LLM final response is: {response_text['your_comment']} ===")
+                        send_to_ui(response_text['your_comment'])
+                        break
                         #print(f"final prompt to LLM is\n\n {50*'*'}\n{prompt}\n{50*'*'}")
 
                     iteration += 1

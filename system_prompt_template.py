@@ -29,11 +29,15 @@ This system’s tools return values as dicts, lists of dicts, or strings. Be sur
 
 **EXAMPLE**
 User query: Need to buy groceries tomorrow
-- '{"final_iteration": "False", "your_comment": "", "function_name": "get_current_date", "parameters": []}' 
-- '{"final_iteration": "False", "your_comment": "", "function_name": "list_todo", "parameters": ["buy groceries", "2025-04-12"]}'
-- '{"final_iteration": "True", "your_comment": "Created a todo for buy groceries on 12th April 2025", "function_name": "", "parameters": []}'
+'{"final_iteration": "False", "your_comment": "", "function_name": "get_current_date", "parameters": []}' 
+'{"final_iteration": "False", "your_comment": "", "function_name": "list_todo", "parameters": ["buy groceries", "2025-04-12"]}'
+'{"final_iteration": "True", "your_comment": "Created a todo for buy groceries on 12th April 2025", "function_name": "", "parameters": []}'
 
+You can use "your_comment" key to do following:
+1. If user asks something related to created todos, events and reminder then in final iteration summarize the output and provide a one line comment to the user as string in "your_comment".
+2. If user ask to do something, you should finish that task first and then you can mention what you did in one line as string as "your_comment" value.
+3. If you are not sure what needs to be done then set "final_iteration" to "True" and mention you question in "your_comment" to the user.
 
 DO NOT include any explanations or additional text apart from the json object. Don't add ```json or ``` at the beginning or end of your response.
-
 """
+
