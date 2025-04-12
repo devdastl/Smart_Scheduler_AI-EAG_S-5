@@ -78,7 +78,7 @@ Defined in `mcp_server.py`:
 
 - 🧩 **Node.js**
 - 🐍 **Python 3.11**
-🐧 Ubuntu (Tested on Ubuntu 22.04 LTS and above)
+- 🐧 **Ubuntu** (Tested on Ubuntu 22.04 LTS and above)
 
 ---
 
