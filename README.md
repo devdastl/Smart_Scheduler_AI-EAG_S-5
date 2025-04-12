@@ -78,6 +78,7 @@ Defined in `mcp_server.py`:
 
 - 🧩 **Node.js**
 - 🐍 **Python 3.11**
+🐧 Ubuntu (Tested on Ubuntu 22.04 LTS and above)
 
 ---
 
@@ -99,11 +100,6 @@ Defined in `mcp_server.py`:
    python3.11 -m venv env
    ```
    - **Activate the environment**:
-     - Windows:
-       ```bash
-       .\env\Scripts\activate
-       ```
-     - macOS/Linux:
        ```bash
        source env/bin/activate
        ```
@@ -116,10 +112,6 @@ Defined in `mcp_server.py`:
    - Start Node.js server:
      ```bash
      npm start
-     ```
-   - Run the MCP server:
-     ```bash
-     python mcp_server.py
      ```
 
 5. **Access the App**:
