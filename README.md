@@ -7,6 +7,9 @@ SmartScheduler is a modern **note-taking** and **scheduling** application that i
 ## 📌 Introduction
 
 SmartScheduler is a versatile tool for **note-taking** and **time management**. It features a clean and responsive UI 🌈 with light/dark theme support 🌗. The app uses **FullCalendar** for visualization and offers a robust API for integration. Powered by LLMs, it can understand user queries in natural language 💬 and assist with planning.
+<br>
+
+![SmartScheduler Screenshot](screenshot.png)
 
 ---
 
