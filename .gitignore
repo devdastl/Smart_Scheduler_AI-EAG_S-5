@@ -1,4 +1,6 @@
 node_modules/
+web_ui/node_modules/
+mcp_backend/__pycache__
 .env
 env
 token.env
