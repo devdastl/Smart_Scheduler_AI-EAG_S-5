@@ -9,6 +9,7 @@ import subprocess
 import os
 import requests
 from datetime import datetime
+from model import *
 
 # instantiate an MCP server client
 mcp = FastMCP("NoteTaker")
@@ -17,55 +18,55 @@ mcp = FastMCP("NoteTaker")
 
 #get current time
 @mcp.tool()
-def get_current_time() -> str:
+def get_current_time() -> GetCurrentTimeOutput:
     """Get the current time in HH:MM format """
-    return datetime.now().strftime("%H:%M")
+    return GetCurrentTimeOutput(result=datetime.now().strftime("%H:%M"))
 
 # get current date
 @mcp.tool()
-def get_current_date() -> str:
+def get_current_date() -> GetCurrentDateOutput:
     """Get the current date in YYYY-MM-DD format"""
-    return datetime.now().strftime("%Y-%m-%d")
+    return GetCurrentDateOutput(result=datetime.now().strftime("%Y-%m-%d"))
 
 # Get all todos given a date
 @mcp.tool()
-def list_todos(date: str) -> list[dict]:
+def list_todos(input: ListTodosInput) -> ListTodosOutput:
     """List all todos for a given date in YYYY-MM-DD format"""
     print("CALLED: list_todos(date: str) -> list[dict]:")
-    response = requests.get(f"http://localhost:3000/api/todos/date/{date}")
-    return response.json()  # Returns list[dict] containing todo items
+    response = requests.get(f"http://localhost:3000/api/todos/date/{input.date}")
+    return ListTodosOutput(result=response.json())
 
 # Create a todo given a date and content
 @mcp.tool()
-def create_todo(date: str, content: str) -> str:
+def create_todo(input: CreateTodoInput) -> CreateTodoOutput:
     """Create a todo given a date and content"""
     print("CALLED: create_todo(date: str, content: str) -> dict:")
-    response = requests.post(f"http://localhost:3000/api/todos/date/{date}", json={"content": content})
-    return f"Todo created successfully with id: {response.json()['id']}"
+    response = requests.post(f"http://localhost:3000/api/todos/date/{input.date}", json={"content": input.content})
+    return CreateTodoOutput(result=f"Todo created successfully with id: {response.json()['id']}")
 
 # change todo status to completed given a unique id
 @mcp.tool()
-def complete_todo(id: str) -> dict:
+def complete_todo(input: CompleteTodoInput) -> CompleteTodoOutput:
     """Change todo status to completed given a unique id"""
     print("CALLED: complete_todo(id: str) -> dict:")
-    response = requests.put(f"http://localhost:3000/api/todos/{id}/toggle")
-    return f"Todo status updated successfully to completed"
+    response = requests.put(f"http://localhost:3000/api/todos/{input.id}/toggle")
+    return CompleteTodoOutput(result="Todo status updated successfully to completed")
 
 # change todo status to uncompleted given a unique id
 @mcp.tool()
-def uncomplete_todo(id: str) -> dict:
+def uncomplete_todo(input: UncompleteTodoInput) -> UncompleteTodoOutput:
     """Change todo status to uncompleted given a unique id"""
     print("CALLED: uncomplete_todo(id: str) -> dict:")
-    response = requests.put(f"http://localhost:3000/api/todos/{id}/toggle")
-    return f"Todo status updated successfully to uncompleted"
+    response = requests.put(f"http://localhost:3000/api/todos/{input.id}/toggle")
+    return UncompleteTodoOutput(result="Todo status updated successfully to uncompleted")
 
 # Delete a todo given a unique id
 @mcp.tool()
-def delete_todo(id: str) -> dict:
+def delete_todo(input: DeleteTodoInput) -> DeleteTodoOutput:
     """Delete a todo given a unique id"""
     print("CALLED: delete_todo(id: str) -> dict:")
-    response = requests.delete(f"http://localhost:3000/api/todos/{id}")
-    return f"Todo deleted successfully"
+    response = requests.delete(f"http://localhost:3000/api/todos/{input.id}")
+    return DeleteTodoOutput(result="Todo deleted successfully")
 
 # Delete all todos given a date (dummy tool)
 #@mcp.tool()
@@ -77,51 +78,52 @@ def delete_todos(date: str) -> dict:
 
 # List all events given a date
 @mcp.tool()
-def list_events(date: str) -> list[dict]:
+def list_events(input: ListEventsInput) -> ListEventsOutput:
     """List all events given a date"""
     print("CALLED: list_events(date: str) -> list[dict]:")
-    response = requests.get(f"http://localhost:3000/api/events/date/{date}")
-    return response.json()
+    response = requests.get(f"http://localhost:3000/api/events/date/{input.date}")
+    return ListEventsOutput(result=response.json())
 
 # Create an event given a date and content
 @mcp.tool()
-def create_event(date: str, content: str) -> dict:
+def create_event(input: CreateEventInput) -> CreateEventOutput:
     """Create an event given a date and content"""
     print("CALLED: create_event(date: str, content: str) -> dict:")
-    response = requests.post(f"http://localhost:3000/api/events/date/{date}", json={"content": content})
-    return f"Event created successfully with id: {response.json()['id']}"
+    response = requests.post(f"http://localhost:3000/api/events/date/{input.date}", json={"content": input.content})
+    return CreateEventOutput(result=f"Event created successfully with id: {response.json()['id']}")
 
 # Delete an event given a unique id
 @mcp.tool()
-def delete_event(id: str) -> dict:
+def delete_event(input: DeleteEventInput) -> DeleteEventOutput:
     """Delete an event given a unique id"""
     print("CALLED: delete_event(id: str) -> dict:")
-    response = requests.delete(f"http://localhost:3000/api/events/{id}")
-    return f"Event deleted successfully"
+    response = requests.delete(f"http://localhost:3000/api/events/{input.id}")
+    return DeleteEventOutput(result="Event deleted successfully")
 
 # List reminders given a date
 @mcp.tool()
-def list_reminders(date: str) -> list[dict]:
+def list_reminders(input: ListRemindersInput) -> ListRemindersOutput:
     """List reminders given a date"""
     print("CALLED: list_reminders(date: str) -> list[dict]:")
-    response = requests.get(f"http://localhost:3000/api/reminders/date/{date}")
-    return response.json()
+    response = requests.get(f"http://localhost:3000/api/reminders/date/{input.date}")
+    return ListRemindersOutput(result=response.json())
 
 # Create a reminder given a date in YYYY-MM-DD format and time in HH:MM 24-hour format and content
 @mcp.tool()
-def create_reminder(date: str, time: str, content: str) -> dict:
+def create_reminder(input: CreateReminderInput) -> CreateReminderOutput:
     """Create a reminder for a given date in YYYY-MM-DD format and at a given time in HH:MM 24-hour format and content"""
     print("CALLED: create_reminder(date: str, time: str, content: str) -> dict:")
-    response = requests.post(f"http://localhost:3000/api/reminders/date/{date}", json={"content": content, "time": time})
-    return f"Reminder created successfully with id: {response.json()['id']}"
+    response = requests.post(f"http://localhost:3000/api/reminders/date/{input.date}", 
+                           json={"content": input.content, "time": input.time})
+    return CreateReminderOutput(result=f"Reminder created successfully with id: {response.json()['id']}")
 
 # Delete a reminder given a unique id
 @mcp.tool()
-def delete_reminder(id: str) -> dict:
+def delete_reminder(input: DeleteReminderInput) -> DeleteReminderOutput:
     """Delete a reminder given a unique id"""
     print("CALLED: delete_reminder(id: str) -> dict:")
-    response = requests.delete(f"http://localhost:3000/api/reminders/{id}")
-    return f"Reminder deleted successfully"
+    response = requests.delete(f"http://localhost:3000/api/reminders/{input.id}")
+    return DeleteReminderOutput(result="Reminder deleted successfully")
 
 # DEFINE RESOURCES
 
@@ -150,7 +152,7 @@ def debug_error(error: str) -> list[base.Message]:
 
 if __name__ == "__main__":
     # Check if running with mcp dev command
-    print("STARTING")
+    print("STARTING THE SERVER AT AMAZING LOCATION")
     if len(sys.argv) > 1 and sys.argv[1] == "dev":
         mcp.run()  # Run without transport for dev server
     else:

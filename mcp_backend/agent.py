@@ -18,7 +18,7 @@ client = genai.Client(api_key=api_key)
 class Agent:
     def __init__(self):
         self.memory_manager = MemoryManager()
-        self.max_iterations = 15
+        self.max_iterations = 2
         self.iteration = 0
         self.last_response = None
         self.iteration_response = []
@@ -32,12 +32,8 @@ class Agent:
 
     def extract_tools_discriptions(self, tools):
         """Get the descriptions of the tools available to the agent"""        
+        print(f"INFO: tools: {tools}")
         try:
-            # First, let's inspect what a tool object looks like
-            # if tools:
-            #     print(f"First tool properties: {dir(tools[0])}")
-            #     print(f"First tool example: {tools[0]}")
-            
             tools_description = []
             for i, tool in enumerate(tools):
                 try:
@@ -47,14 +43,44 @@ class Agent:
                     name = getattr(tool, 'name', f'tool_{i}')
                     
                     # Format the input schema in a more readable way
-                    if 'properties' in params:
-                        param_details = []
-                        for param_name, param_info in params['properties'].items():
+                    param_details = []
+                    
+                    # Check if we have $defs (Pydantic models)
+                    if '$defs' in params:
+                        # Get the input model name from the ref
+                        input_ref = params['properties']['input']['$ref']
+                        model_name = input_ref.split('/')[-1]
+                        
+                        # Get the model definition
+                        model_def = params['$defs'][model_name]
+                        
+                        # Extract parameters from the model
+                        for param_name, param_info in model_def['properties'].items():
                             param_type = param_info.get('type', 'unknown')
                             param_details.append(f"{param_name}: {param_type}")
-                        params_str = ', '.join(param_details)
                     else:
-                        params_str = 'no parameters'
+                        # Handle simple parameters
+                        for param_name, param_info in params.get('properties', {}).items():
+                            param_type = param_info.get('type', 'unknown')
+                            param_details.append(f"{param_name}: {param_type}")
+
+                    params_str = ', '.join(param_details) if param_details else 'no parameters'
+
+                    # Get return type from the tool's return type annotation
+                    return_type = getattr(tool, 'return_type', 'unknown')
+                    if hasattr(return_type, '__origin__'):
+                        if return_type.__origin__ is list:
+                            inner_type = return_type.__args__[0]
+                            if hasattr(inner_type, '__name__'):
+                                return_type_str = f"list[{inner_type.__name__}]"
+                            else:
+                                return_type_str = "list"
+                        else:
+                            return_type_str = str(return_type)
+                    elif hasattr(return_type, '__name__'):
+                        return_type_str = return_type.__name__
+                    else:
+                        return_type_str = str(return_type)
 
                     tool_desc = f"{i+1}. {name}({params_str}) - {desc}"
                     tools_description.append(tool_desc)
@@ -115,6 +141,7 @@ class Agent:
                         
                         # Action phase
                         tool_result = await execute_tool_call(session, decision, tools)
+                        print(f"INFO: tool result: {tool_result} and type: {type(tool_result)}")
                         
                         # Update memory and state
                         self.iteration_response.append(
