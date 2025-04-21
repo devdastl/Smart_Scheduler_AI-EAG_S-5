@@ -41,6 +41,7 @@ async def perceive_input(client: genai.Client, user_input: str, system_prompt: s
         prompt = f"{system_prompt}\n\nQuery: {user_input}"
         response_text = await generate_with_timeout(client, prompt)
         response_text = clean_code_block(response_text)
+        print(f"INFO: perception response: {response_text}")
         return json.loads(response_text)
     except Exception as e:
         print(f"Error in perception: {e}")

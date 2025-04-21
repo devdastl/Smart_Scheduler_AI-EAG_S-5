@@ -6,7 +6,7 @@ from system_prompt_template import system_prompt
 async def make_decision(
     client: genai.Client,
     current_query: str,
-    tools: List[Any],
+    tools_description: str,
     memory_manager: Any
 ) -> Dict[str, Any]:
     """
@@ -21,13 +21,13 @@ async def make_decision(
         
         # Create context with tools and memories
         context = {
-            "tools": tools,
+            "tools": tools_description,
             "memories": relevant_memories,
             "query": current_query
         }
         
         # Get decision from LLM
-        decision = await perceive_input(client, current_query, system_prompt)
+        decision = await perceive_input(client, current_query, system_prompt.replace("_tools_description_", tools_description))
         
         # Validate decision structure
         required_keys = ['final_iteration', 'your_comment', 'function_name', 'parameters']
