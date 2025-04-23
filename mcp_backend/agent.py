@@ -9,6 +9,7 @@ from decision import make_decision
 from action import execute_tool_call
 from memory import MemoryManager
 from google import genai
+import requests
 
 # Load environment variables
 load_dotenv("../token.env")
@@ -29,6 +30,31 @@ class Agent:
         self.iteration = 0
         self.iteration_response = []
         self.memory_manager.clear_session_memory()
+
+    def send_text_to_ui(self, text):
+        """Send text to the UI"""
+        # Get the server URL from environment or use default
+        server_url = os.environ.get('NOTETAKER_SERVER_URL', 'http://localhost:3000')
+        api_endpoint = f"{server_url}/api/smart-output"
+        
+        try:
+            # Send the text to the API
+            response = requests.post(
+                api_endpoint,
+                json={"text": text},
+                headers={"Content-Type": "application/json"}
+            )
+            
+            # Check if the request was successful
+            if response.status_code == 200:
+                print(f"Successfully sent text to API: {response.json()}")
+                return True
+            else:
+                print(f"Error sending text to API: {response.status_code} - {response.text}")
+                return False
+        except Exception as e:
+            print(f"Exception when sending to API: {str(e)}")
+            return False
 
     def extract_tools_discriptions(self, tools):
         """Get the descriptions of the tools available to the agent"""        
@@ -177,7 +203,7 @@ async def main():
     user_prompt = sys.argv[1]
     agent = Agent()
     result = await agent.run(user_prompt, user_preferences)
-    return result
+    agent.send_text_to_ui(result)
 
 if __name__ == "__main__":
     asyncio.run(main()) 
