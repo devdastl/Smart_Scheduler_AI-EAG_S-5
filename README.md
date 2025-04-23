@@ -29,25 +29,30 @@ SmartScheduler is a versatile tool for **note-taking** and **time management**. 
 ```
 SmartScheduler/
 │
-├── mcp_client.py
-├── mcp_server.py
-├── system_prompt_template.py
-├── server.js
-├── index.html
-├── package.json
-├── package-lock.json
-├── README.md
-├── .gitignore
-├── token.env
-├── api-docs.html
-│
-├── css/
-├── data/
-├── env/
-├── images/
-├── js/
-├── node_modules/
-└── __pycache__/
+├── mcp_backend/ (python backend code for agentic decision making)
+│   ├── agent.py
+│   ├── decision.py
+│   ├── model.py
+│   ├── memory.py
+│   ├── system_prompt_template.py
+|
+├── web_app/ (frontend code for the web app)
+│   ├── server.js
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── css/
+│   ├── data/
+│   ├── api-docs.html  
+│   ├── node_modules
+│   ├── js/
+|
+├── token.env (environment variables for the project)
+├── .gitignore (git ignore file)
+├── env/ (python environment)
+├── requirements.txt (python dependencies)
+├── screenshot.png (screenshot of the web app)
+├── README.md (this file)
 ```
 
 ---
@@ -95,7 +100,7 @@ Defined in `mcp_server.py`:
 
 2. **Install Node.js Dependencies**:
    ```bash
-   npm install
+   cd web_app && npm install && cd ..
    ```
 
 3. **Set Up Python Environment**:
@@ -114,7 +119,7 @@ Defined in `mcp_server.py`:
 4. **Run the Application**:
    - Start Node.js server:
      ```bash
-     npm start
+     cd web_app && npm start
      ```
 
 5. **Access the App**:
