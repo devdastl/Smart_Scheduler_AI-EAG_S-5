@@ -1,5 +1,9 @@
 from typing import List, Dict, Any
 import json
+import logging
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 class MemoryItem:
     def __init__(self, content: str, metadata: Dict[str, Any] = None):

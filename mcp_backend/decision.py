@@ -2,6 +2,10 @@ from typing import Dict, Any, List
 from google import genai
 from perception import perceive_input
 from system_prompt_template import system_prompt
+import logging
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 async def make_decision(
     client: genai.Client,
@@ -37,5 +41,5 @@ async def make_decision(
         return decision
         
     except Exception as e:
-        print(f"Error in decision making: {e}")
+        logger.error(f"Error in decision making: {e}")
         raise 

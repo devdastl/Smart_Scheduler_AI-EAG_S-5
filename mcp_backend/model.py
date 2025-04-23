@@ -1,5 +1,9 @@
 from pydantic import BaseModel
 from typing import List, Dict, Optional
+import logging
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 # Time and Date Models
 class GetCurrentTimeOutput(BaseModel):

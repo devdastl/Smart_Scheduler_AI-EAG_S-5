@@ -10,6 +10,10 @@ from action import execute_tool_call
 from memory import MemoryManager
 from google import genai
 import requests
+import logging
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv("../token.env")
@@ -23,6 +27,8 @@ class Agent:
         self.iteration = 0
         self.last_response = None
         self.iteration_response = []
+        # Setup logger configuration with timestamp
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     def reset_state(self):
         """Reset all state variables to their initial state"""
@@ -32,7 +38,7 @@ class Agent:
         self.memory_manager.clear_session_memory()
 
     def send_text_to_ui(self, text):
-        """Send text to the UI"""
+        logger.info(f"Sending text to UI: {text}")
         # Get the server URL from environment or use default
         server_url = os.environ.get('NOTETAKER_SERVER_URL', 'http://localhost:3000')
         api_endpoint = f"{server_url}/api/smart-output"
@@ -57,6 +63,7 @@ class Agent:
             return False
 
     def extract_tools_discriptions(self, tools):
+        logger.info("Extracting tool descriptions")
         """Get the descriptions of the tools available to the agent"""        
         try:
             tools_description = []
@@ -123,34 +130,33 @@ class Agent:
         return tools_description
 
     async def run(self, user_prompt, user_preferences):
-        """Main execution loop for the agent"""
         self.reset_state()
-        print("Starting main execution...")
+        logger.info("Starting main execution...")
         
         try:
             # Create MCP server connection
-            print("Establishing connection to MCP server...")
+            logger.info("Establishing connection to MCP server...")
             server_params = StdioServerParameters(
                 command="python",
                 args=["mcp_server.py"]
             )
 
             async with stdio_client(server_params) as (read, write):
-                print("Connection established, creating session...")
+                logger.info("Connection established, creating session...")
                 async with ClientSession(read, write) as session:
-                    print("Session created, initializing...")
+                    logger.info("Session created, initializing...")
                     await session.initialize()
                     
                     # Get available tools
-                    print("Requesting tool list...")
+                    logger.info("Requesting tool list...")
                     tools_result = await session.list_tools()
                     tools = tools_result.tools
-                    print(f"Successfully retrieved {len(tools)} tools")
+                    logger.info(f"Successfully retrieved {len(tools)} tools")
                     tools_description = self.extract_tools_discriptions(tools)
 
                     # Main execution loop
                     while self.iteration < self.max_iterations:
-                        print(f"\n--- Iteration {self.iteration + 1} ---")
+                        logger.info(f"\n--- Iteration {self.iteration + 1} ---")
                         
                         # Perception phase
                         current_query = user_prompt if self.last_response is None else \
@@ -167,8 +173,8 @@ class Agent:
                         decision = await make_decision(client, current_query, tools_description, self.memory_manager)
                         
                         if decision["final_iteration"] == "True":
-                            print("\n=== Agent Execution Complete ===")
-                            print(f"\n=== LLM final response is: {decision['your_comment']} ===")
+                            logger.info("\n=== Agent Execution Complete ===")
+                            logger.info(f"\n=== LLM final response is: {decision['your_comment']} ===")
                             return decision['your_comment']
                         
                         # Action phase
@@ -184,7 +190,7 @@ class Agent:
                         self.iteration += 1
 
         except Exception as e:
-            print(f"Error in main execution: {e}")
+            logger.error(f"Error in main execution: {e}")
             import traceback
             traceback.print_exc()
         finally:

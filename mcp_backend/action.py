@@ -1,6 +1,10 @@
 from typing import Dict, Any, List
 from mcp import ClientSession
 from model import *
+import logging
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 async def execute_tool_call(
     session: ClientSession,
@@ -65,5 +69,5 @@ async def execute_tool_call(
         return str(result)
         
     except Exception as e:
-        print(f"Error in tool execution: {e}")
+        logger.error(f"Error in tool execution: {e}")
         raise 
