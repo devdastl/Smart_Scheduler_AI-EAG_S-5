@@ -8,6 +8,15 @@ class GetCurrentTimeOutput(BaseModel):
 class GetCurrentDateOutput(BaseModel):
     result: str
 
+class GetCurrentDayOutput(BaseModel):
+    result: str
+
+class GetDayOfWeekInput(BaseModel):
+    date: str
+
+class GetDayOfWeekOutput(BaseModel):
+    result: str
+
 # Todo Models
 class ListTodosInput(BaseModel):
     date: str

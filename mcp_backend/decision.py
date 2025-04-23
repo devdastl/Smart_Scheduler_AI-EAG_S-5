@@ -22,7 +22,8 @@ async def make_decision(
 
         # Update system prompt with user preferences
         if relevant_memories:   
-            relevant_memories = "\n- ".join(relevant_memories[0]["content"].split(","))
+            relevant_memories = "- " + (relevant_memories[0]["content"].split(":")[-1])
+            relevant_memories = "\n- ".join(relevant_memories.split(","))
             system_prompt = system_prompt.replace("_user_preferences_", relevant_memories)
         
         # Get decision from LLM

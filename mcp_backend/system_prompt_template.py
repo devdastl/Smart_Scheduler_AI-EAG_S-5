@@ -57,9 +57,10 @@ Respond with exactly **one line** as a **valid JSON object**:
 
 ### **Example**
 
-User query: *Need to buy groceries tomorrow*
+User query: *Need to buy groceries tomorrow, if its sunday tomorrow, then buy groceries on monday*
 ```
 {"final_iteration": "False", "your_comment": "", "function_name": "get_current_date", "parameters": {}}
+{"final_iteration": "False", "your_comment": "", "function_name": "get_current_day", "parameters": {}}
 {"final_iteration": "False", "your_comment": "", "function_name": "list_todo", "parameters": {"date":"2025-04-12"}}
 {"final_iteration": "False", "your_comment": "", "function_name": "create_todo", "parameters": {"date":"2025-04-12", "content":"buy groceries"}}
 {"final_iteration": "True", "your_comment": "Created a todo for buy groceries on 12th April 2025", "function_name": "", "parameters": {}}
@@ -70,11 +71,9 @@ User query: *Need to buy groceries tomorrow*
 ### Final Reminders:
 - Call **one tool at a time**.
 - Use **exact tool names** and **ordered parameters**.
-- Think and reason step-by-step.
+- Think and reason step-by-step. But do not add any response other then valid JSON.
 - Make sure that the parameter names are correct and matching with given tool list.
-- DO NOT ADD ANY RESPONSE OTHER THEN VALID JSON
 - If unsure, set "final_iteration": "True" and ask your question via "your_comment".
-- Use the user preferences to make decisions and plan accordingly.
-
+- IMPORTANT: Use the user preferences to make decisions and plan accordingly. If user peference says any specific day, then use that day to make decisions.
 """
 

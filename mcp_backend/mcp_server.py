@@ -28,6 +28,18 @@ def get_current_date() -> GetCurrentDateOutput:
     """Get the current date in YYYY-MM-DD format"""
     return GetCurrentDateOutput(result=datetime.now().strftime("%Y-%m-%d"))
 
+# get current day of the week
+@mcp.tool()
+def get_current_day() -> GetCurrentDayOutput:
+    """Get the current day of the week"""
+    return GetCurrentDayOutput(result=datetime.now().strftime("%A"))
+
+# given a date, return the day of the week
+@mcp.tool()
+def get_day_of_week(date: str) -> GetDayOfWeekOutput:
+    """Get the day of the week for a given date in YYYY-MM-DD format"""
+    return GetDayOfWeekOutput(result=f'The day of the week for {date} is {datetime.strptime(date, "%Y-%m-%d").strftime("%A")}')
+
 # Get all todos given a date
 @mcp.tool()
 def list_todos(input: ListTodosInput) -> ListTodosOutput:
