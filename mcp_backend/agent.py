@@ -32,7 +32,6 @@ class Agent:
 
     def extract_tools_discriptions(self, tools):
         """Get the descriptions of the tools available to the agent"""        
-        print(f"INFO: tools: {tools}")
         try:
             tools_description = []
             for i, tool in enumerate(tools):
