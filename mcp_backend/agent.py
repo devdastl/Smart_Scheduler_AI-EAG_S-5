@@ -96,7 +96,7 @@ class Agent:
 
         return tools_description
 
-    async def run(self, user_prompt):
+    async def run(self, user_prompt, user_preferences):
         """Main execution loop for the agent"""
         self.reset_state()
         print("Starting main execution...")
@@ -130,6 +130,13 @@ class Agent:
                         current_query = user_prompt if self.last_response is None else \
                             f"{user_prompt}\n\n{' '.join(self.iteration_response)}\nWhat should I do next?"
                         
+                        # Update memory with user preferences and save it permanently
+                        if user_preferences is not None:
+                            self.memory_manager.add_memory(f"User preferences: {user_preferences}")
+                            self.memory_manager.save_memories("user_preferences.json")
+                        elif user_preferences is None and os.path.exists("user_preferences.json"):
+                            self.memory_manager.load_memories("user_preferences.json")
+
                         # Decision phase
                         decision = await make_decision(client, current_query, tools_description, self.memory_manager)
                         
@@ -161,10 +168,15 @@ async def main():
     if len(sys.argv) < 2:
         print("Error: No user prompt provided")
         sys.exit(1)
+
+    user_preferences = None
+    if len(sys.argv) == 3:
+        user_preferences = sys.argv[2]
+        print(f"INFO: Provided user preferences: {user_preferences}")
     
     user_prompt = sys.argv[1]
     agent = Agent()
-    result = await agent.run(user_prompt)
+    result = await agent.run(user_prompt, user_preferences)
     return result
 
 if __name__ == "__main__":

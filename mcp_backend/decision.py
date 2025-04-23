@@ -16,15 +16,14 @@ async def make_decision(
     - Retrieved memories
     """
     try:
-        # Get relevant memories
-        relevant_memories = memory_manager.retrieve_memories(current_query)
-        
-        # Create context with tools and memories
-        context = {
-            "tools": tools_description,
-            "memories": relevant_memories,
-            "query": current_query
-        }
+        global system_prompt
+        # Get user preferences if present
+        relevant_memories = memory_manager.retrieve_memories("user preferences")
+
+        # Update system prompt with user preferences
+        if relevant_memories:   
+            relevant_memories = "\n- ".join(relevant_memories[0]["content"].split(","))
+            system_prompt = system_prompt.replace("_user_preferences_", relevant_memories)
         
         # Get decision from LLM
         decision = await perceive_input(client, current_query, system_prompt.replace("_tools_description_", tools_description))

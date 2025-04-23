@@ -12,10 +12,18 @@ class MemoryManager:
         self.memories: List[MemoryItem] = []
         self.session_id = None
 
+    def check_duplicate_memory(self, content: str) -> bool:
+        """Check if a memory already exists in the list"""
+        for memory in self.memories:
+            if memory.content == content:
+                return True
+        return False
+
     def add_memory(self, content: str, metadata: Dict[str, Any] = None):
         """Add a new memory item"""
-        memory = MemoryItem(content, metadata)
-        self.memories.append(memory)
+        if not self.check_duplicate_memory(content):        
+            memory = MemoryItem(content, metadata)
+            self.memories.append(memory)
 
     def retrieve_memories(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
         """
