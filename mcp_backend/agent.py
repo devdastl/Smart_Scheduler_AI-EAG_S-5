@@ -18,7 +18,7 @@ client = genai.Client(api_key=api_key)
 class Agent:
     def __init__(self):
         self.memory_manager = MemoryManager()
-        self.max_iterations = 2
+        self.max_iterations = 3
         self.iteration = 0
         self.last_response = None
         self.iteration_response = []

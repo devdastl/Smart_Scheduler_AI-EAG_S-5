@@ -28,7 +28,7 @@ If a tool call fails (returns `None`, errors, or an unexpected structure):
 
 ### **Response Format**
 Respond with exactly **one line** as a **valid JSON object**:
-{"final_iteration": "True/False", "your_comment": "your_comment", "function_name": "name-of-function-to-call", "parameters": [param1, param2, ...]}
+{"final_iteration": "True/False", "your_comment": "your_comment", "function_name": "name-of-function-to-call", "parameters": {"param1":"value", "param2":"value", ...}}
 
 
 #### Key Definitions:
@@ -45,7 +45,7 @@ Respond with exactly **one line** as a **valid JSON object**:
 
 - `function_name`: Exact name of the tool to call.
 
-- `parameters`: Ordered list of inputs to the tool.
+- `parameters`: valid dict with parameter name as key and parameter value as value.
 
 ---
 
@@ -53,9 +53,10 @@ Respond with exactly **one line** as a **valid JSON object**:
 
 User query: *Need to buy groceries tomorrow*
 ```
-{"final_iteration": "False", "your_comment": "", "function_name": "get_current_date", "parameters": []}
-{"final_iteration": "False", "your_comment": "", "function_name": "list_todo", "parameters": ["buy groceries", "2025-04-12"]}
-{"final_iteration": "True", "your_comment": "Created a todo for buy groceries on 12th April 2025", "function_name": "", "parameters": []}
+{"final_iteration": "False", "your_comment": "", "function_name": "get_current_date", "parameters": {}}
+{"final_iteration": "False", "your_comment": "", "function_name": "list_todo", "parameters": {"date":"2025-04-12"}}
+{"final_iteration": "False", "your_comment": "", "function_name": "create_todo", "parameters": {"date":"2025-04-12", "content":"buy groceries"}}
+{"final_iteration": "True", "your_comment": "Created a todo for buy groceries on 12th April 2025", "function_name": "", "parameters": {}}
 ```
 
 ---
@@ -64,6 +65,8 @@ User query: *Need to buy groceries tomorrow*
 - Call **one tool at a time**.
 - Use **exact tool names** and **ordered parameters**.
 - Think and reason step-by-step.
+- Make sure that the parameter names are correct and matching with given tool list.
+- DO NOT ADD ANY RESPONSE OTHER THEN VALID JSON
 - If unsure, set "final_iteration": "True" and ask your question via "your_comment".
 
 """

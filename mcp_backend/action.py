@@ -1,5 +1,6 @@
 from typing import Dict, Any, List
 from mcp import ClientSession
+from model import *
 
 async def execute_tool_call(
     session: ClientSession,
@@ -22,30 +23,61 @@ async def execute_tool_call(
         # Prepare arguments according to the tool's input schema
         arguments = {}
         schema_properties = tool.inputSchema.get('properties', {})
+        pydantic_model_class = None
+        print(schema_properties)
 
-        for param_name, param_info in schema_properties.items():
-            if not params:
-                raise ValueError(f"Not enough parameters provided for {func_name}")
+        #check if function requires input argument
+        if 'input' in schema_properties.keys():
+            pydantic_model_name = schema_properties['input']['$ref'].split("/")[-1]
+            model_input_schema = get_pydantic_field_types(pydantic_model_name)
+            pydantic_model_class = globals()[pydantic_model_name]
+            print(model_input_schema)
+
+            for argument in model_input_schema.keys():
+                if not argument in params.keys():
+                    raise ValueError(f"{argument} parameter in not provided for {func_name}")
+
+                param_type = model_input_schema[argument]
+                value = params[argument]
+
+                #Convert the value to the correct type
+                if param_type == 'integer':
+                    params[argument] = int(value)
+                elif param_type == 'number':
+                    params[argument] = float(value)
+                elif param_type == 'array':
+                    if isinstance(value, str):
+                        value = value.strip('[]').split(',')
+                    params[argument] = [int(x.strip()) for x in value]
+                else:
+                    params[argument] = str(value)
+
+        # for param_name, param_info in schema_properties.items():
+        #     if not params:
+        #         raise ValueError(f"Not enough parameters provided for {func_name}")
                 
-            value = params.pop(0)
-            param_type = param_info.get('type', 'string')
+        #     value = params.pop(0)
+        #     param_type = param_info.get('type', 'string')
             
-            # Convert the value to the correct type
-            if param_type == 'integer':
-                arguments[param_name] = int(value)
-            elif param_type == 'number':
-                arguments[param_name] = float(value)
-            elif param_type == 'array':
-                if isinstance(value, str):
-                    value = value.strip('[]').split(',')
-                arguments[param_name] = [int(x.strip()) for x in value]
-            else:
-                arguments[param_name] = str(value)
+        #     # Convert the value to the correct type
+        #     if param_type == 'integer':
+        #         arguments[param_name] = int(value)
+        #     elif param_type == 'number':
+        #         arguments[param_name] = float(value)
+        #     elif param_type == 'array':
+        #         if isinstance(value, str):
+        #             value = value.strip('[]').split(',')
+        #         arguments[param_name] = [int(x.strip()) for x in value]
+        #     else:
+        #         arguments[param_name] = str(value)
 
         # Execute the tool call
-        result = await session.call_tool(func_name, arguments=arguments)
+        print(params, type(params))
+        result = await session.call_tool(func_name, arguments=params) if pydantic_model_class is None \
+        else await session.call_tool(func_name, arguments={"input":pydantic_model_class(**params)})
         
         # Process the result
+        print(result, result.content, type(result.content))
         if hasattr(result, 'content'):
             if isinstance(result.content, list):
                 return [
