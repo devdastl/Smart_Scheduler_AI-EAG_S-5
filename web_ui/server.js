@@ -263,20 +263,20 @@ app.post('/api/smart-output', (req, res) => {
 
 // POST /api/execute-python
 app.post('/api/execute-python', (req, res) => {
-  const { text } = req.body;
+  const { text, preferences } = req.body;
   
   if (!text) {
     return res.status(400).json({ error: 'No text provided' });
   }
   
-  // Execute the Python script with the input text
+  // Execute the Python script with the input text and preferences
   const { exec } = require('child_process');
   
   // Set the NOTETAKER_SERVER_URL environment variable so the Python script knows where to send its results
   const serverUrl = `http://localhost:${port}`;
-  const gnome_command = `'source env/bin/activate; NOTETAKER_SERVER_URL=${serverUrl} python mcp_client.py "${text}"; exec bash'`
-  // const command = `gnome-terminal -- bash -c ${gnome_command}`;
-  const command = `cd ../mcp_backend && NOTETAKER_SERVER_URL=${serverUrl} python mcp_client.py "${text}"`
+  const gnome_command = `'cd ../mcp_backend && source env/bin/activate; NOTETAKER_SERVER_URL=${serverUrl} python mcp_client.py "${text}" "${preferences}"; exec bash'`
+  //const command = `gnome-terminal -- bash -c ${gnome_command}`;
+  const command = `cd ../mcp_backend && NOTETAKER_SERVER_URL=${serverUrl} python agent.py "${text}" "${preferences}"`
   
   exec(command, (error, stdout, stderr) => {
     if (error) {
